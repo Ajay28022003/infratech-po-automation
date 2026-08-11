@@ -21,7 +21,9 @@ import {
   Network,
   Truck,
   MessageSquare,
-  ChevronDown
+  ChevronDown,
+  Building,
+  CheckCircle2
 } from 'lucide-react';
 
 const navItems = [
@@ -53,6 +55,8 @@ const navItems = [
 
 export const DashboardLayout = () => {
   const location = useLocation();
+  const isValidationView = location.pathname.startsWith('/document-processing/') && location.pathname !== '/document-processing';
+
   const [isMasterDataOpen, setIsMasterDataOpen] = useState(
     location.pathname.startsWith('/customers') ||
     location.pathname.startsWith('/suppliers') ||
@@ -62,134 +66,150 @@ export const DashboardLayout = () => {
   );
 
   return (
-    <div className="flex h-screen bg-slate-50 text-slate-900 font-sans overflow-hidden">
-      {/* Complete Full-Featured Sidebar */}
-      <aside className="w-64 bg-slate-900 text-white border-r border-slate-800 flex-col hidden lg:flex shadow-2xl z-20 relative">
-        <div className="absolute inset-0 bg-gradient-to-b from-indigo-500/10 to-purple-500/10 pointer-events-none"></div>
-        <div className="h-16 flex items-center px-6 border-b border-slate-800/60 relative z-10 backdrop-blur-sm bg-slate-900/50">
-          <Link to="/" className="flex items-center gap-3 group w-full">
-            <div className="w-8 h-8 bg-indigo-600 rounded-lg flex items-center justify-center font-black text-white text-xs shadow-md group-hover:scale-105 transition-transform">
-              iAT
+    <div className="flex h-screen w-screen bg-slate-100/70 text-slate-900 font-sans overflow-hidden antialiased">
+      {/* Refined Enterprise Sidebar */}
+      <aside className="w-64 bg-slate-900 text-slate-200 border-r border-slate-800 flex flex-col shrink-0 z-30 select-none">
+        {/* Brand Header */}
+        <div className="h-16 flex items-center px-5 border-b border-slate-800/80 bg-slate-950/40">
+          <Link to="/" className="flex items-center gap-3 w-full">
+            <div className="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white text-xs shadow-sm ring-1 ring-indigo-400/30">
+              INF
             </div>
-            <div>
-              <p className="font-bold text-sm tracking-tight text-white leading-tight">INFRATECH</p>
-              <p className="text-[10px] text-indigo-400 font-semibold tracking-wider uppercase">PO Automation</p>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-sm text-white tracking-tight leading-none">INFRATECH</span>
+                <span className="text-[9px] font-mono font-bold bg-slate-800 text-indigo-400 px-1.5 py-0.5 rounded">FZ LLC</span>
+              </div>
+              <p className="text-[10px] text-slate-400 font-medium mt-0.5 truncate">PO Automation & Sage 300</p>
             </div>
           </Link>
         </div>
 
-        <nav className="flex-1 overflow-y-auto py-4 custom-scrollbar relative z-10">
-          <ul className="space-y-1 px-3">
-            {navItems.map((item) => {
-              const Icon = item.icon;
-              
-              if (item.subItems) {
-                return (
-                  <li key={item.name} className="pt-0.5 pb-0.5">
-                    <button 
-                      onClick={() => setIsMasterDataOpen(!isMasterDataOpen)}
-                      className="flex items-center w-full px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 group text-slate-400 hover:bg-slate-800/80 hover:text-slate-100 border border-transparent"
-                    >
-                      <Icon className="w-4 h-4 mr-3 flex-shrink-0 text-slate-500 group-hover:text-indigo-300 transition-colors" />
-                      <span className="flex-1 text-left">{item.name}</span>
-                      <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${isMasterDataOpen ? 'rotate-180' : ''}`} />
-                    </button>
-                    {isMasterDataOpen && (
-                      <ul className="mt-1 space-y-1 pl-10 relative before:absolute before:left-5 before:top-0 before:bottom-3 before:w-px before:bg-slate-700">
-                        {item.subItems.map((subItem) => {
-                          const isSubActive = location.pathname === subItem.path || location.pathname.startsWith(subItem.path + '/');
-                          return (
-                            <li key={subItem.name} className="relative">
-                              <div className="absolute left-[-20px] top-1/2 w-2.5 h-px bg-slate-700"></div>
-                              <Link 
-                                to={subItem.path}
-                                className={`flex items-center px-2.5 py-1.5 text-xs font-medium rounded-lg transition-all duration-200 ${
-                                  isSubActive
-                                    ? 'bg-indigo-500/20 text-indigo-300 font-bold' 
-                                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
-                                }`}
-                              >
-                                {subItem.name}
-                              </Link>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    )}
-                  </li>
-                );
-              }
-
-              const isActive = location.pathname === item.path || 
-                (item.path !== '/' && location.pathname.startsWith(item.path + '/')) ||
-                (item.path === '/document-processing' && location.pathname.startsWith('/document-processing'));
-
+        {/* Navigation List */}
+        <nav className="flex-1 overflow-y-auto py-3 custom-scrollbar px-3 space-y-0.5">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            
+            if (item.subItems) {
               return (
-                <li key={item.name}>
-                  <Link 
-                    to={item.path!} 
-                    className={`flex items-center px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 group ${
-                      isActive
-                        ? 'bg-indigo-500/20 text-indigo-300 shadow-sm border border-indigo-500/20 font-bold' 
-                        : 'text-slate-400 hover:bg-slate-800/80 hover:text-slate-100 border border-transparent'
-                    }`}
+                <div key={item.name} className="pt-1">
+                  <button 
+                    onClick={() => setIsMasterDataOpen(!isMasterDataOpen)}
+                    className="flex items-center w-full px-3 py-2 text-xs font-semibold rounded-lg text-slate-400 hover:bg-slate-800 hover:text-slate-100 transition-colors"
                   >
-                    <Icon className={`w-4 h-4 mr-3 flex-shrink-0 transition-transform duration-200 ${isActive ? 'text-indigo-400' : 'text-slate-500 group-hover:text-indigo-300'}`} />
-                    <span>{item.name}</span>
-                  </Link>
-                </li>
+                    <Icon className="w-4 h-4 mr-3 shrink-0 text-slate-500" />
+                    <span className="flex-1 text-left">{item.name}</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-500 transition-transform duration-200 ${isMasterDataOpen ? 'rotate-180 text-slate-300' : ''}`} />
+                  </button>
+                  {isMasterDataOpen && (
+                    <div className="mt-1 space-y-0.5 pl-6 border-l border-slate-800 ml-5">
+                      {item.subItems.map((subItem) => {
+                        const isSubActive = location.pathname === subItem.path || location.pathname.startsWith(subItem.path + '/');
+                        return (
+                          <Link 
+                            key={subItem.name}
+                            to={subItem.path}
+                            className={`flex items-center px-3 py-1.5 text-xs rounded-md transition-colors ${
+                              isSubActive
+                                ? 'bg-indigo-600/20 text-indigo-300 font-bold border-l-2 border-indigo-500' 
+                                : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/60'
+                            }`}
+                          >
+                            {subItem.name}
+                          </Link>
+                        )
+                      })}
+                    </div>
+                  )}
+                </div>
               );
-            })}
-          </ul>
+            }
+
+            const isActive = location.pathname === item.path || 
+              (item.path !== '/' && location.pathname.startsWith(item.path + '/')) ||
+              (item.path === '/document-processing' && location.pathname.startsWith('/document-processing'));
+
+            return (
+              <Link 
+                key={item.name}
+                to={item.path!} 
+                className={`flex items-center px-3 py-2 text-xs font-semibold rounded-lg transition-colors ${
+                  isActive
+                    ? 'bg-indigo-600 text-white shadow-xs font-bold' 
+                    : 'text-slate-400 hover:bg-slate-800/80 hover:text-slate-100'
+                }`}
+              >
+                <Icon className={`w-4 h-4 mr-3 shrink-0 ${isActive ? 'text-white' : 'text-slate-500'}`} />
+                <span>{item.name}</span>
+              </Link>
+            );
+          })}
         </nav>
         
-        {/* User profile at bottom */}
-        <div className="p-3 border-t border-slate-800/80 relative z-10 bg-slate-900/80">
-          <div className="flex items-center gap-3 p-2 rounded-xl bg-slate-800/60 border border-slate-800">
-            <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold shrink-0">
+        {/* User Context Footer */}
+        <div className="p-3 border-t border-slate-800 bg-slate-950/30">
+          <div className="flex items-center gap-2.5 p-2 rounded-lg bg-slate-800/50 border border-slate-800">
+            <div className="w-7 h-7 rounded-md bg-indigo-700 flex items-center justify-center text-white text-xs font-bold shrink-0">
               BP
             </div>
             <div className="text-left flex-1 min-w-0">
-              <p className="text-xs font-semibold text-slate-200 leading-none truncate">Bhavani Prasad</p>
-              <p className="text-[10px] text-slate-400 mt-1 font-medium truncate">Commercial Manager</p>
+              <p className="text-xs font-bold text-slate-200 truncate">Bhavani Prasad</p>
+              <p className="text-[10px] text-slate-400 truncate">Commercial Manager</p>
             </div>
-            <Settings className="w-3.5 h-3.5 text-slate-500" />
           </div>
         </div>
       </aside>
 
-      {/* Main Content */}
+      {/* Main Content Area */}
       <main className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* Top Header */}
-        <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 lg:px-8 shrink-0 z-10 shadow-xs sticky top-0">
-          <div className="flex items-center flex-1">
-            <div className="max-w-md w-full hidden md:block relative group">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input 
-                type="text" 
-                placeholder="Search POs, Quotations, Items, or ERP records..." 
-                className="w-full pl-10 pr-4 py-2 bg-slate-100 border border-transparent rounded-xl text-xs font-medium focus:bg-white focus:border-indigo-500 outline-none transition-all shadow-xs"
-              />
+        {/* Top Header - Hidden in Full Validation Split View */}
+        {!isValidationView && (
+          <header className="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10 sticky top-0">
+            <div className="flex items-center gap-4 flex-1">
+              {/* Search Input */}
+              <div className="max-w-md w-full hidden md:block relative">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
+                <input 
+                  type="text" 
+                  placeholder="Search POs (e.g. 4517145590), Quotes, or SKUs..." 
+                  className="w-full pl-9 pr-8 py-1.5 bg-slate-50 border border-slate-200 rounded-lg text-xs font-medium focus:bg-white focus:border-indigo-500 outline-none transition-all shadow-2xs"
+                />
+                <span className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[10px] font-mono text-slate-400 bg-slate-200/60 px-1 py-0.5 rounded">⌘K</span>
+              </div>
+
+              {/* Plant & Entity Context */}
+              <div className="hidden xl:flex items-center gap-2 text-xs text-slate-500 border-l border-slate-200 pl-4">
+                <Building className="w-3.5 h-3.5 text-slate-400" />
+                <span>Plant: <strong className="text-slate-700">Ras Al Khaimah Works</strong></span>
+                <span className="text-slate-300">•</span>
+                <span>Sage Entity: <strong className="text-slate-700">Co. 11975</strong></span>
+              </div>
             </div>
-          </div>
-          
-          <div className="flex items-center space-x-4">
-            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md border border-emerald-200">
-              <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sage 300 ERP Live
-            </span>
-            <button className="p-2 relative text-slate-400 hover:text-indigo-600 transition-all rounded-full hover:bg-indigo-50">
-              <Bell className="w-4 h-4" />
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-rose-500 rounded-full border-2 border-white"></span>
-            </button>
-          </div>
-        </header>
+            
+            <div className="flex items-center gap-3">
+              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 bg-emerald-50 text-emerald-700 text-xs font-bold rounded-md border border-emerald-200 shadow-2xs">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" /> Sage 300 Connected
+              </span>
+              <button className="p-2 relative text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-100" title="Notifications">
+                <Bell className="w-4 h-4" />
+                <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-indigo-600 rounded-full"></span>
+              </button>
+            </div>
+          </header>
+        )}
         
-        {/* Page Content */}
-        <div className="flex-1 overflow-auto bg-slate-50 relative">
-          <div className="max-w-7xl mx-auto w-full p-6 lg:p-8">
+        {/* Page Container */}
+        {isValidationView ? (
+          <div className="flex-1 flex flex-col min-h-0 w-full overflow-hidden bg-slate-100">
             <Outlet />
           </div>
-        </div>
+        ) : (
+          <div className="flex-1 overflow-auto bg-slate-50/70 custom-scrollbar">
+            <div className="max-w-7xl mx-auto w-full p-6 lg:p-8">
+              <Outlet />
+            </div>
+          </div>
+        )}
       </main>
     </div>
   );
