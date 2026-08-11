@@ -1,389 +1,567 @@
 import { useState, useMemo } from 'react';
 import { useParams, Link, useNavigate } from 'react-router-dom';
-import { CheckCircle2, XCircle, ArrowRight, RotateCw, AlertTriangle, ShieldCheck, Clock, Zap, ArrowLeft, ZoomIn, ZoomOut, Link as LinkIcon, FileText } from 'lucide-react';
-import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
+import { 
+  CheckCircle2, ArrowLeft, FileSpreadsheet, Check,
+  FileText, MessageSquare, UserCheck, Layers, ArrowRightLeft,
+  ExternalLink, Download
+} from 'lucide-react';
 
-interface QuoteItem {
+interface LineItem {
   id: string;
-  sku: string;
-  desc: string;
+  itemCode: string;
+  customerItemCode?: string;
+  description: string;
   qty: number;
-  price: number;
-}
-
-interface POItem {
-  id: string;
-  extractedSku: string;
-  extractedDesc: string;
-  extractedQty: number;
   extractedPrice: number;
-  mappedQuoteItemId: string | null;
+  referencePrice: number;
+  total: number;
+  matchStatus: 'matched' | 'price_mismatch' | 'mapped_from_text' | 'cross_referenced';
 }
 
-const quoteData: QuoteItem[] = [
-  { id: 'q1', sku: 'SKU-CAM-01', desc: '4K Security Camera', qty: 4, price: 1200 },
-  { id: 'q2', sku: 'SKU-CBL-100', desc: 'SDI Coaxial Cable (Per Meter)', qty: 100, price: 15 },
-  { id: 'q3', sku: 'SKU-MLD-01', desc: 'Cable Molding (Per Meter)', qty: 100, price: 5 },
-  { id: 'q4', sku: 'SKU-SPR-01', desc: 'Installation Spares Kit', qty: 1, price: 250 },
-];
+interface ScenarioData {
+  id: string;
+  scenarioNumber: 1 | 2 | 3 | 4;
+  title: string;
+  badge: string;
+  scenarioDescription: string;
+  customer: string;
+  customerAddress: string;
+  customerTRN: string;
+  poNumber: string;
+  poDate: string;
+  quoteRef?: string;
+  deliveryTerms: string;
+  paymentTerms: string;
+  rawPoUrl: string;
+  rawPoFilename: string;
+  rawQuoteUrl?: string;
+  rawQuoteFilename?: string;
+  referenceDocument: {
+    type: 'Price List' | 'Quotation' | 'Email Quote';
+    name: string;
+    description: string;
+    referenceCode: string;
+  };
+  items: LineItem[];
+  hasSurcharge?: boolean;
+  surchargePercent?: number;
+  surchargeAmount?: number;
+  vatRate: number;
+  targetSalesOrder: string;
+  targetInvoice: string;
+}
 
-const initialPOItems: POItem[] = [
-  { id: 'p1', extractedSku: 'SKU-CAM-01', extractedDesc: '4K Security Camera', extractedQty: 4, extractedPrice: 1200, mappedQuoteItemId: 'q1' },
-  { id: 'p2', extractedSku: 'SKU-CBL-100', extractedDesc: 'SDI Coax Cable', extractedQty: 100, extractedPrice: 15, mappedQuoteItemId: 'q2' },
-  { id: 'p3', extractedSku: 'SKU-MLD-01', extractedDesc: 'Cable Conduit', extractedQty: 100, extractedPrice: 5, mappedQuoteItemId: 'q3' },
-  { id: 'p4', extractedSku: 'SKU-SPR-01', extractedDesc: 'Spares & Connectors', extractedQty: 1, extractedPrice: 250, mappedQuoteItemId: 'q4' },
-];
+const scenarios: Record<string, ScenarioData> = {
+  'PO-4517145590': {
+    id: 'PO-4517145590',
+    scenarioNumber: 1,
+    title: 'Scenario 1: Customer PO without Quotation (Price List Based)',
+    badge: 'Price List Match',
+    scenarioDescription: 'Customer order matched directly against approved Tier 2 Contract Price List schedule.',
+    customer: 'EATON FZE',
+    customerAddress: 'Plot No: S30805, Jebel Ali Free Zone, Dubai, UAE',
+    customerTRN: '100296552100003',
+    poNumber: '4517145590',
+    poDate: '12 May 2026',
+    deliveryTerms: 'DP World Unit 11, JAFZA Logistics Park, Dubai',
+    paymentTerms: '90 Days Credit',
+    rawPoUrl: '/samples/scenario1_po.pdf',
+    rawPoFilename: 'PO 4517145590 - Infratech.pdf',
+    referenceDocument: {
+      type: 'Price List',
+      name: 'Tier 2 xPower Price List - Rev 1.5.xlsx',
+      description: 'Master Contract Pricing for Eaton FZE',
+      referenceCode: 'CONTRACT-EATON-T2'
+    },
+    items: [
+      { id: '1', itemCode: 'XPSN22506B', description: 'xPowerS PB 250A Bot 6W TPN-NZM1/PDE1 OG', qty: 15, extractedPrice: 856.00, referencePrice: 856.00, total: 12840.00, matchStatus: 'matched' },
+      { id: '2', itemCode: 'XPSN22510B', description: 'xPowerS PB 250A Bot 10W TPN-NZM1/PDE1 OG', qty: 28, extractedPrice: 1064.00, referencePrice: 1064.00, total: 29792.00, matchStatus: 'matched' },
+      { id: '3', itemCode: 'XPSN22512B', description: 'xPowerS PB 250A Bot 12W TPN-NZM1/PDE1 OG', qty: 18, extractedPrice: 1225.00, referencePrice: 1225.00, total: 22050.00, matchStatus: 'matched' },
+    ],
+    vatRate: 0.05,
+    targetSalesOrder: 'SO-S00006715',
+    targetInvoice: 'IN00007477'
+  },
+  'PO-VD-44192': {
+    id: 'PO-VD-44192',
+    scenarioNumber: 2,
+    title: 'Scenario 2: Customer PO based on Quotation (Matching Part References)',
+    badge: 'Quotation Match',
+    scenarioDescription: 'Customer order matched against approved Quotation ENQ-26-E-0164 with exact panel part codes.',
+    customer: 'Verger Delporte UAE Ltd',
+    customerAddress: 'P.O Box 5629, Industrial Road 1, Industrial Area 5, Sharjah, UAE',
+    customerTRN: '100412893100003',
+    poNumber: 'PO-VD-44192',
+    poDate: '10 July 2026',
+    quoteRef: 'ENQ-26-E-0164',
+    deliveryTerms: 'Ex-works, Sharjah Factory (5% Customs & Clearance)',
+    paymentTerms: '90 Days PDC from delivery',
+    rawPoUrl: '/samples/scenario2_po.pdf',
+    rawPoFilename: 'PO-1 - Verger Delporte.pdf',
+    rawQuoteUrl: '/samples/scenario2_quote.pdf',
+    rawQuoteFilename: 'Quotation Offer ENQ-26-E-0164.pdf',
+    referenceDocument: {
+      type: 'Quotation',
+      name: 'Quotation Offer No: ENQ-26-E-0164',
+      description: 'Formal Quote for Verger Delporte UAE (Attn: Prasanth V.K)',
+      referenceCode: 'ENQ-26-E-0164'
+    },
+    items: [
+      { id: '1', itemCode: 'IFC86/200+MP', description: '800H x 600W x 200D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 27, extractedPrice: 315.00, referencePrice: 315.00, total: 8505.00, matchStatus: 'matched' },
+      { id: '2', itemCode: 'IFC128/300+MP+SD', description: '1200H x 800W x 300D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 17, extractedPrice: 600.00, referencePrice: 600.00, total: 10200.00, matchStatus: 'matched' },
+      { id: '3', itemCode: 'IFC66/150+MP', description: '600H x 600W x 150D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 2, extractedPrice: 225.00, referencePrice: 225.00, total: 450.00, matchStatus: 'matched' },
+      { id: '4', itemCode: 'IFC148/300+MP+SD', description: '1400H x 800W x 300D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 7, extractedPrice: 685.00, referencePrice: 685.00, total: 4795.00, matchStatus: 'matched' },
+      { id: '5', itemCode: 'IFC126/200+MP', description: '1200H x 600W x 200D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 1, extractedPrice: 460.00, referencePrice: 460.00, total: 460.00, matchStatus: 'matched' },
+      { id: '6', itemCode: 'IFC106/200+MP', description: '1000H x 600W x 200D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 1, extractedPrice: 390.00, referencePrice: 390.00, total: 390.00, matchStatus: 'matched' },
+      { id: '7', itemCode: 'IFC88/300+MP', description: '800H x 800W x 300D Single Door Compact Enclosure with Mounting Plate + Gland Plate', qty: 1, extractedPrice: 430.00, referencePrice: 430.00, total: 430.00, matchStatus: 'matched' },
+      { id: '8', itemCode: 'IFL168/300+MP+SD', description: '1600H x 800W x 300D Single Door Large Enclosure with Mounting Plate + Gland Plate', qty: 1, extractedPrice: 980.00, referencePrice: 980.00, total: 980.00, matchStatus: 'matched' },
+    ],
+    hasSurcharge: true,
+    surchargePercent: 10,
+    surchargeAmount: 2621.00,
+    vatRate: 0.00,
+    targetSalesOrder: 'SO-S00007526',
+    targetInvoice: 'IN00007526'
+  },
+  'PO-CSO-9912': {
+    id: 'PO-CSO-9912',
+    scenarioNumber: 3,
+    title: 'Scenario 3: Customer PO based on Quotation (Without Part References)',
+    badge: 'NLP Description Match',
+    scenarioDescription: 'Customer order specified dimensional text without SKU. AI NLP matched text to internal ERP part code.',
+    customer: 'Can Serv Oil & Gas',
+    customerAddress: 'Musaffah Industrial Area, Abu Dhabi, UAE',
+    customerTRN: '100998124500003',
+    poNumber: 'PO-CSO-9912',
+    poDate: '04 May 2026',
+    quoteRef: 'QT-EMAIL-PO00670',
+    deliveryTerms: 'Abu Dhabi Free Zone Site Delivery',
+    paymentTerms: '30 Days Credit',
+    rawPoUrl: '/samples/scenario3_po.pdf',
+    rawPoFilename: 'PO.pdf (Can Serv Oil)',
+    rawQuoteUrl: '/samples/scenario3_quote.png',
+    rawQuoteFilename: 'Quotation Email Confirmation.png',
+    referenceDocument: {
+      type: 'Email Quote',
+      name: 'Approved Email Quotation - PO00670',
+      description: 'Dimensional specification quote (2000H x 1423W x 331D Double Door)',
+      referenceCode: 'QT-EMAIL-PO00670'
+    },
+    items: [
+      { id: '1', itemCode: 'INF-DB-2000-1423-A', description: '2000H x 1423W x 331D Distribution Panel Enclosure IP55 with Mounting Plate & Double Door', qty: 4, extractedPrice: 24350.00, referencePrice: 24350.00, total: 97400.00, matchStatus: 'mapped_from_text' },
+    ],
+    hasSurcharge: true,
+    surchargePercent: 10,
+    surchargeAmount: 9752.00,
+    vatRate: 0.00,
+    targetSalesOrder: 'SO-S00007469',
+    targetInvoice: 'IN00007469'
+  },
+  'PO-EN-7296': {
+    id: 'PO-EN-7296',
+    scenarioNumber: 4,
+    title: 'Scenario 4: Quotation without Part Number & Customer PO with Customer Part Number',
+    badge: 'Customer Part Cross-Match',
+    scenarioDescription: 'Customer order used customer part number ER-ENC-200. Cross-matched to internal SKU INF-ENC-2R16M.',
+    customer: 'Encom Trading LLC',
+    customerAddress: 'P.O Box 17421, Electro RAK Group, Ras Al Khaimah, UAE',
+    customerTRN: '100881923100003',
+    poNumber: 'PO-EN-7296',
+    poDate: '02 May 2026',
+    quoteRef: 'QT-EMAIL-ENCOM',
+    deliveryTerms: 'Ras Al Khaimah Central Warehouse',
+    paymentTerms: '30 Days PDC',
+    rawPoUrl: '/samples/scenario4_po.pdf',
+    rawPoFilename: 'PO.pdf (Encom Trading)',
+    rawQuoteUrl: '/samples/scenario4_quote.png',
+    rawQuoteFilename: 'Quotation Email Encom Group.png',
+    referenceDocument: {
+      type: 'Email Quote',
+      name: 'Email Quote - Encom Group',
+      description: 'Cross-referenced customer SKU ER-ENC-200 to Infratech item INF-ENC-2R16M',
+      referenceCode: 'QT-EMAIL-ENCOM'
+    },
+    items: [
+      { id: '1', itemCode: 'INF-ENC-2R16M', customerItemCode: 'ER-ENC-200', description: '1200H x 600W x 200D Single Door Compact Enclosure IP65 with Gland Plate', qty: 35, extractedPrice: 460.00, referencePrice: 460.00, total: 16100.00, matchStatus: 'cross_referenced' },
+    ],
+    hasSurcharge: true,
+    surchargePercent: 15.5,
+    surchargeAmount: 2500.00,
+    vatRate: 0.00,
+    targetSalesOrder: 'SO-S00007296',
+    targetInvoice: 'IN00007296'
+  }
+};
 
 export const DocumentValidation = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   
-  const [selectedQuote, setSelectedQuote] = useState('');
-  const [poItems, setPoItems] = useState<POItem[]>(initialPOItems);
-  
-  // Calculate if everything is mapped and matches
-  const validationStatus = useMemo(() => {
-    if (selectedQuote === '') return { isValid: false, issues: 0 };
-    
-    let issues = 0;
-    poItems.forEach(poItem => {
-      if (!poItem.mappedQuoteItemId) {
-        issues++;
-      } else {
-        const quoteItem = quoteData.find(q => q.id === poItem.mappedQuoteItemId);
-        if (quoteItem) {
-          if (quoteItem.qty !== poItem.extractedQty || quoteItem.price !== poItem.extractedPrice) {
-            issues++;
-          }
-        }
-      }
-    });
-    
-    return { isValid: issues === 0, issues };
-  }, [selectedQuote, poItems]);
+  // Resolve scenario key
+  const currentScenarioKey = (id && scenarios[id]) ? id : 'PO-4517145590';
+  const activeScenario = scenarios[currentScenarioKey] || scenarios['PO-4517145590'];
 
-  const handleMapItem = (poItemId: string, quoteItemId: string) => {
-    setPoItems(prev => prev.map(item => item.id === poItemId ? { ...item, mappedQuoteItemId: quoteItemId === '' ? null : quoteItemId } : item));
+  // View state: toggle between 'po' (Customer PO) and 'quote' (Reference Quote)
+  const [activeDocView, setActiveDocView] = useState<'po' | 'quote'>('po');
+  const [approvalNote, setApprovalNote] = useState('Commercial review verified. Quantities, prices, and terms match approved master data.');
+
+  // Subtotal & Totals
+  const subtotal = useMemo(() => {
+    return activeScenario.items.reduce((sum, item) => sum + item.total, 0);
+  }, [activeScenario]);
+
+  const surchargeAmount = useMemo(() => {
+    return activeScenario.hasSurcharge ? (activeScenario.surchargeAmount || subtotal * 0.10) : 0;
+  }, [activeScenario, subtotal]);
+
+  const vatAmount = useMemo(() => {
+    return (subtotal + surchargeAmount) * activeScenario.vatRate;
+  }, [activeScenario, subtotal, surchargeAmount]);
+
+  const grandTotal = useMemo(() => {
+    return subtotal + surchargeAmount + vatAmount;
+  }, [subtotal, surchargeAmount, vatAmount]);
+
+  const handleApproveAndPost = () => {
+    navigate('/sales-orders');
   };
 
-  const handleApproveDiscrepancy = (poItemId: string) => {
-    // "Approving" a discrepancy means we force the PO quantity/price to match the quote, or accept the PO terms. 
-    // For simplicity, let's update the PO item to match the quote item exactly so it passes validation.
-    setPoItems(prev => prev.map(item => {
-      if (item.id === poItemId && item.mappedQuoteItemId) {
-        const qItem = quoteData.find(q => q.id === item.mappedQuoteItemId);
-        if (qItem) {
-          return { ...item, extractedQty: qItem.qty, extractedPrice: qItem.price };
-        }
-      }
-      return item;
-    }));
-  };
-
-  const handleCreateSalesOrder = () => {
-    if (validationStatus.isValid) {
-      navigate('/sales-orders');
-    }
-  };
+  const currentDocUrl = activeDocView === 'po' ? activeScenario.rawPoUrl : (activeScenario.rawQuoteUrl || activeScenario.rawPoUrl);
+  const currentDocFilename = activeDocView === 'po' ? activeScenario.rawPoFilename : (activeScenario.rawQuoteFilename || activeScenario.rawPoFilename);
+  const isImageFile = currentDocUrl.endsWith('.png') || currentDocUrl.endsWith('.jpg');
 
   return (
-    <div className="h-full flex flex-col animate-in fade-in duration-500 absolute inset-0 bg-slate-100">
-      <header className="h-20 bg-white border-b border-slate-200 flex items-center justify-between px-6 shrink-0 z-10 shadow-sm">
-        <div className="flex items-center gap-4">
-          <Link to="/document-processing" className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-lg transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <div className="h-8 w-px bg-slate-200"></div>
-          <div>
-            <div className="flex items-center gap-2 text-xs font-medium text-slate-500 mb-0.5">
-              <span>Inbox</span> <ArrowRight className="w-3 h-3" /> <span className="text-indigo-600">Document #{id || 'PO-9982'}</span>
+    <div className="h-full flex flex-col animate-in fade-in duration-300 absolute inset-0 bg-slate-100 text-slate-900 overflow-hidden font-sans">
+      {/* Top Navigation Bar */}
+      <header className="bg-white border-b border-slate-200 shrink-0 z-20 shadow-xs px-6 py-2.5">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <Link 
+              to="/document-processing" 
+              className="flex items-center gap-1 text-xs font-semibold text-slate-600 hover:text-indigo-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors"
+            >
+              <ArrowLeft className="w-4 h-4" />
+              <span>Inbound Queue</span>
+            </Link>
+
+            <div className="h-4 w-px bg-slate-300"></div>
+
+            <div className="flex items-center gap-2">
+              <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-100">
+                Scenario {activeScenario.scenarioNumber}: {activeScenario.badge}
+              </span>
+              <span className="text-xs font-bold text-slate-800">
+                {activeScenario.customer}
+              </span>
+              <span className="text-xs text-slate-400 font-mono">
+                (PO: {activeScenario.poNumber})
+              </span>
             </div>
-            <h1 className="text-xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-              <Zap className="w-5 h-5 text-indigo-500" /> Validation Center
-            </h1>
           </div>
-        </div>
-        
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 text-slate-700 text-sm font-bold rounded-xl hover:bg-slate-50 shadow-sm transition-colors">
-            <RotateCw className="w-4 h-4" /> Reprocess
-          </button>
-          <button className="flex items-center gap-2 px-4 py-2 bg-rose-50 border border-rose-200 text-rose-700 text-sm font-bold rounded-xl hover:bg-rose-100 shadow-sm transition-colors">
-            <XCircle className="w-4 h-4" /> Reject
-          </button>
-          <button 
-            disabled={!validationStatus.isValid}
-            onClick={handleCreateSalesOrder}
-            className={`flex items-center gap-2 px-5 py-2 text-sm font-bold rounded-xl transition-all shadow-md ${
-              validationStatus.isValid 
-                ? 'bg-emerald-600 text-white hover:bg-emerald-700 shadow-emerald-200 hover:-translate-y-0.5' 
-                : 'bg-slate-100 text-slate-400 cursor-not-allowed border border-slate-200 shadow-none'
-            }`}>
-            <CheckCircle2 className="w-4 h-4" /> Create Sales Order
-          </button>
+
+          {/* Scenario Selector */}
+          <div className="flex items-center gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200">
+            {Object.values(scenarios).map((sc) => (
+              <button
+                key={sc.id}
+                onClick={() => {
+                  setActiveDocView('po');
+                  navigate(`/document-processing/${sc.id}`);
+                }}
+                className={`px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  currentScenarioKey === sc.id
+                    ? 'bg-white text-indigo-700 shadow-xs border border-slate-200'
+                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200/60'
+                }`}
+              >
+                Scenario {sc.scenarioNumber}
+              </button>
+            ))}
+          </div>
+
+          {/* Actions */}
+          <div className="flex items-center gap-2">
+            <a 
+              href={currentDocUrl} 
+              target="_blank" 
+              rel="noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-all shadow-xs"
+            >
+              <ExternalLink className="w-3.5 h-3.5 text-slate-500" /> Open Raw File
+            </a>
+            <button 
+              onClick={handleApproveAndPost}
+              className="flex items-center gap-1.5 px-4 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all cursor-pointer hover:shadow-md"
+            >
+              <CheckCircle2 className="w-4 h-4" /> Approve & Post to Sage 300
+            </button>
+          </div>
         </div>
       </header>
 
+      {/* Main Split Screen Area */}
       <div className="flex-1 flex overflow-hidden">
-        {/* Left Panel: Document Viewer */}
-        <div className="w-1/2 flex flex-col bg-slate-800 border-r border-slate-300 relative">
-          <div className="absolute top-4 left-1/2 -translate-x-1/2 flex items-center gap-2 bg-slate-900/80 backdrop-blur-sm rounded-lg p-1 z-10 border border-slate-700 shadow-xl">
-            <button className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"><ZoomOut className="w-4 h-4" /></button>
-            <span className="text-xs font-bold text-slate-300 px-2">100%</span>
-            <button className="p-1.5 text-slate-300 hover:text-white hover:bg-slate-700 rounded transition-colors"><ZoomIn className="w-4 h-4" /></button>
-          </div>
-          
-          <div className="flex-1 overflow-auto p-8 flex justify-center custom-scrollbar">
-            <div className="w-full max-w-2xl bg-white shadow-2xl aspect-[1/1.4] p-12 relative flex flex-col">
-              <div className="border-b-2 border-slate-900 pb-6 mb-8 flex justify-between">
-                <div>
-                  <h2 className="text-3xl font-black text-slate-900 tracking-tighter">SERVICE WORK ORDER</h2>
-                  <p className="text-slate-500 font-bold mt-2">WO-2026-9982</p>
-                </div>
-                <div className="text-right">
-                  <h3 className="text-xl font-bold text-slate-800">CineRig Solutions</h3>
-                  <p className="text-sm text-slate-500">accounts@cinerig.com</p>
-                </div>
-              </div>
-              <div className="flex-1 flex flex-col relative bg-white">
-                <div className="mb-6 flex justify-between text-sm">
-                  <div>
-                    <p className="font-bold text-slate-700 mb-1">Vendor:</p>
-                    <p className="text-slate-600 font-medium">ProCamera Connect LLC</p>
-                    <p className="text-slate-500">Dubai, UAE</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-bold text-slate-700 mb-1">Shipping To:</p>
-                    <p className="text-slate-600 font-medium">CineRig HQ</p>
-                    <p className="text-slate-500">Abu Dhabi, UAE</p>
-                  </div>
-                </div>
-                
-                <table className="w-full text-left mb-8">
-                  <thead className="border-b-2 border-slate-800 text-slate-800">
-                    <tr>
-                      <th className="py-3 px-2 font-bold uppercase text-xs tracking-wider">Service Details</th>
-                      <th className="py-3 px-2 font-bold uppercase text-xs tracking-wider text-right">Value</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-slate-100 text-slate-700">
-                    <tr>
-                      <td className="py-4 px-2">
-                        <p className="font-bold text-slate-900">Installation Service Type</p>
-                        <p className="text-xs text-slate-500">Category: Security</p>
-                      </td>
-                      <td className="py-4 px-2 text-right font-medium">Camera Installation</td>
-                    </tr>
-                    <tr>
-                      <td className="py-4 px-2">
-                        <p className="font-bold text-slate-900">Number of Cameras</p>
-                        <p className="text-xs text-slate-500">Units required</p>
-                      </td>
-                      <td className="py-4 px-2 text-right font-bold text-slate-900">4</td>
-                    </tr>
-                    <tr>
-                      <td className="py-4 px-2">
-                        <p className="font-bold text-slate-900">Total Distance</p>
-                        <p className="text-xs text-slate-500">Wiring required</p>
-                      </td>
-                      <td className="py-4 px-2 text-right font-bold text-slate-900">100m</td>
-                    </tr>
-                  </tbody>
-                </table>
+        {/* Left Side: Real Raw Document Viewer */}
+        <div className="w-1/2 flex flex-col bg-slate-900 border-r border-slate-300 relative overflow-hidden">
+          {/* Document Switcher Toolbar */}
+          <div className="h-11 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between z-10 shrink-0">
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setActiveDocView('po')}
+                className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                  activeDocView === 'po'
+                    ? 'bg-indigo-600 text-white shadow-xs'
+                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                }`}
+              >
+                <FileText className="w-3.5 h-3.5" />
+                <span>Raw Customer PO ({activeScenario.poNumber})</span>
+              </button>
 
-                <div className="flex justify-end mt-auto pb-12">
-                  <div className="w-64">
-                    <div className="flex justify-between py-2 border-b border-slate-200">
-                      <span className="text-slate-600 font-medium">Subtotal:</span>
-                      <span className="font-bold text-slate-800">AED 7,050.00</span>
-                    </div>
-                    <div className="flex justify-between py-2 border-b border-slate-200">
-                      <span className="text-slate-600 font-medium">VAT (5%):</span>
-                      <span className="font-bold text-slate-800">AED 352.50</span>
-                    </div>
-                    <div className="flex justify-between py-3 bg-slate-50 px-3 rounded-lg mt-2">
-                      <span className="font-black text-slate-900">Total:</span>
-                      <span className="font-black text-indigo-700">AED 7,402.50</span>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="absolute bottom-0 left-0 w-full pt-4 border-t border-slate-200 text-xs text-slate-400 flex justify-between">
-                  <p>Authorized Signature: _______________________</p>
-                  <p>Page 1 of 1</p>
-                </div>
-              </div>
+              {activeScenario.rawQuoteUrl && (
+                <button
+                  onClick={() => setActiveDocView('quote')}
+                  className={`flex items-center gap-1.5 px-3 py-1 text-xs font-bold rounded-md transition-all ${
+                    activeDocView === 'quote'
+                      ? 'bg-indigo-600 text-white shadow-xs'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800'
+                  }`}
+                >
+                  <MessageSquare className="w-3.5 h-3.5" />
+                  <span>Raw Quotation Offer</span>
+                </button>
+              )}
             </div>
+
+            <div className="flex items-center gap-2 text-slate-400 text-xs">
+              <span className="text-[11px] font-mono truncate max-w-[200px] text-slate-300">
+                {currentDocFilename}
+              </span>
+              <a 
+                href={currentDocUrl} 
+                download
+                className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
+                title="Download Raw File"
+              >
+                <Download className="w-3.5 h-3.5" />
+              </a>
+            </div>
+          </div>
+
+          {/* Genuine Raw Document Embed */}
+          <div className="flex-1 bg-slate-950 flex items-center justify-center relative overflow-hidden">
+            {isImageFile ? (
+              <div className="w-full h-full overflow-auto flex items-center justify-center p-4 custom-scrollbar">
+                <img 
+                  src={currentDocUrl} 
+                  alt={currentDocFilename}
+                  className="max-w-full max-h-full object-contain rounded shadow-2xl border border-slate-700 bg-white"
+                />
+              </div>
+            ) : (
+              <iframe 
+                src={`${currentDocUrl}#toolbar=1&navpanes=0&scrollbar=1`}
+                className="w-full h-full border-0 bg-slate-900"
+                title={currentDocFilename}
+              />
+            )}
           </div>
         </div>
 
-        {/* Right Panel: OCR Results & Validation */}
-        <div className="w-1/2 flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar pb-12">
-          <div className="p-6 space-y-6">
-            
-            <Card className="bg-slate-900 border-slate-800 text-slate-300">
-              <CardContent className="p-4">
-                <div className="flex justify-between items-center text-sm font-medium">
-                  <div className="flex items-center gap-3">
-                    <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    <span className="text-white font-bold">Nexus AI Engine v4.2</span>
-                  </div>
-                  <div className="flex items-center gap-3 text-slate-400">
-                    <span className="flex items-center gap-1"><Clock className="w-3 h-3" /> Processed in 1.4s</span>
-                    <span className="px-2 py-0.5 bg-emerald-500/20 text-emerald-400 text-xs font-bold rounded">98% Confidence</span>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
+        {/* Right Side: Human Commercial Review & Sage 300 Matching Console */}
+        <div className="w-1/2 flex flex-col bg-white overflow-y-auto custom-scrollbar p-6 space-y-5">
+          {/* Header Review Card */}
+          <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 flex items-center justify-between">
+            <div>
+              <div className="flex items-center gap-2">
+                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-100 text-emerald-800">
+                  Ready for Manager Approval
+                </span>
+                <span className="text-xs text-slate-500 font-medium">All OCR line items verified</span>
+              </div>
+              <h3 className="text-sm font-bold text-slate-900 mt-1">
+                Order Verification & Cross-Match Console
+              </h3>
+            </div>
+            <div className="text-right">
+              <span className="text-[11px] text-slate-500">Target ERP Order:</span>
+              <p className="font-mono font-bold text-indigo-600 text-sm">{activeScenario.targetSalesOrder}</p>
+            </div>
+          </div>
 
-            <Card className="border-indigo-100 shadow-md">
-              <CardHeader className="bg-indigo-50/50 border-b border-indigo-50 py-4">
-                <CardTitle className="text-base text-indigo-900 flex items-center gap-2">
-                  <LinkIcon className="w-4 h-4 text-indigo-500" /> Link to Approved Quotation
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="p-5">
-                <div className="flex items-center gap-4">
-                  <div className="flex-1">
-                    <select 
-                      value={selectedQuote} 
-                      onChange={(e) => setSelectedQuote(e.target.value)}
-                      className="w-full px-3 py-2.5 bg-white border border-slate-200 rounded-lg text-sm font-semibold text-slate-700 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all shadow-sm cursor-pointer"
-                    >
-                      <option value="">-- Select a Quotation to validate against --</option>
-                      <option value="QT-2026-001">QT-2026-001 (CineRig Solutions) - AED 7,402.50</option>
-                    </select>
-                  </div>
-                  {selectedQuote !== '' && (
-                    <div className="flex-shrink-0">
-                      <Link to={`/quotations/${selectedQuote}`} target="_blank" className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors">
-                        <FileText className="w-4 h-4" /> View Quote
-                      </Link>
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
+          {/* Customer Metadata Card */}
+          <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-xs">
+            <div className="flex items-center justify-between mb-3">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Extracted Customer & Terms
+              </span>
+              <span className="text-xs font-mono font-semibold text-slate-600">
+                TRN: {activeScenario.customerTRN}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-4 text-xs">
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Customer / Buyer:</p>
+                <p className="font-bold text-slate-900 text-xs mt-0.5">{activeScenario.customer}</p>
+                <p className="text-slate-500 text-[11px] mt-0.5 leading-snug">{activeScenario.customerAddress}</p>
+              </div>
+              <div>
+                <p className="text-[10px] font-bold text-slate-400 uppercase">Commercial Terms:</p>
+                <p className="text-slate-800 text-[11px] font-medium mt-0.5">Terms: <strong>{activeScenario.paymentTerms}</strong></p>
+                <p className="text-slate-500 text-[11px] mt-0.5 leading-snug">{activeScenario.deliveryTerms}</p>
+              </div>
+            </div>
+          </div>
 
-            {selectedQuote !== '' && (
-              <Card className="flex-1 flex flex-col shadow-xl border-t-4 border-t-indigo-500">
-                <CardHeader className="py-4 px-5 border-b border-slate-100 bg-white flex flex-row items-center justify-between">
-                  <CardTitle className="text-base text-slate-800">Line Mapping: PO vs Quotation</CardTitle>
-                  {!validationStatus.isValid ? (
-                    <div className="flex items-center gap-2 text-xs font-bold px-2 py-1 bg-amber-50 text-amber-600 rounded border border-amber-200">
-                      <AlertTriangle className="w-3 h-3" /> {validationStatus.issues} Action(s) Required
-                    </div>
-                  ) : (
-                    <div className="flex items-center gap-2 text-xs font-bold px-2 py-1 bg-emerald-50 text-emerald-600 rounded border border-emerald-200">
-                      <CheckCircle2 className="w-3 h-3" /> All Lines Validated
-                    </div>
-                  )}
-                </CardHeader>
-                
-                <div className="p-0 overflow-x-auto">
-                  <table className="w-full text-left text-sm whitespace-nowrap">
-                    <thead className="bg-slate-50 border-b border-slate-200">
-                      <tr>
-                        <th className="p-3 font-semibold text-slate-600 bg-slate-100/50 w-2/5">Extracted PO Item</th>
-                        <th className="p-3 font-semibold text-slate-600 bg-indigo-50/30 w-2/5">Matched Quote Item</th>
-                        <th className="p-3 font-semibold text-slate-600 w-1/5 text-center">Status</th>
-                      </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-100">
-                      <tr className="bg-slate-100 border-b border-slate-200">
-                        <td colSpan={3} className="p-3">
-                           <div className="flex items-center gap-2">
-                             <div className="w-1.5 h-4 bg-indigo-500 rounded-full"></div>
-                             <span className="font-bold text-slate-800 text-sm uppercase tracking-wider">Camera Installation</span>
-                             <span className="px-2 py-0.5 bg-indigo-100 text-indigo-700 text-[10px] font-bold rounded-full ml-2">Extracted BOM</span>
-                           </div>
-                        </td>
-                      </tr>
-                      {poItems.map((po, index) => {
-                        const qItem = po.mappedQuoteItemId ? quoteData.find(q => q.id === po.mappedQuoteItemId) : null;
-                        const isQtyMatch = qItem && qItem.qty === po.extractedQty;
-                        const isPriceMatch = qItem && qItem.price === po.extractedPrice;
-                        const isExactMatch = qItem && isQtyMatch && isPriceMatch;
-                        
-                        return (
-                          <tr key={po.id} className="hover:bg-slate-50/50 transition-colors relative">
-                            <td className="p-3 pl-12 bg-slate-50/30 align-top relative">
-                              <div className={`absolute left-5 top-0 w-px bg-slate-300 ${index === poItems.length - 1 ? 'h-6' : 'h-full'}`}></div>
-                              <div className="absolute left-5 top-6 w-4 h-px bg-slate-300"></div>
-                              <p className="font-bold text-slate-800">{po.extractedSku}</p>
-                              <p className="text-xs text-slate-500 mb-1 truncate w-40">{po.extractedDesc}</p>
-                              <div className="flex gap-2 text-xs">
-                                <span className="font-medium text-slate-600">Qty: <span className="font-bold text-slate-800">{po.extractedQty}</span></span>
-                                <span className="font-medium text-slate-600">Price: <span className="font-bold text-slate-800">AED {po.extractedPrice}</span></span>
-                              </div>
-                            </td>
-                            
-                            <td className="p-3 align-top bg-indigo-50/10 border-l border-slate-100 relative">
-                              {qItem ? (
-                                <div>
-                                  <div className="flex items-center gap-2 mb-1">
-                                    <select 
-                                      value={po.mappedQuoteItemId || ''}
-                                      onChange={(e) => handleMapItem(po.id, e.target.value)}
-                                      className="text-xs font-bold text-indigo-600 bg-indigo-50 border border-indigo-100 rounded px-1.5 py-0.5 outline-none cursor-pointer hover:border-indigo-300"
-                                    >
-                                      <option value="">Unmap</option>
-                                      {quoteData.map(q => <option key={q.id} value={q.id}>{q.sku}</option>)}
-                                    </select>
-                                  </div>
-                                  <p className="text-xs text-slate-500 mb-1 truncate w-40">{qItem.desc}</p>
-                                  <div className="flex gap-2 text-xs">
-                                    <span className={`font-medium ${!isQtyMatch ? 'text-amber-600 font-bold bg-amber-50 px-1 rounded' : 'text-slate-600'}`}>Qty: {qItem.qty}</span>
-                                    <span className={`font-medium ${!isPriceMatch ? 'text-amber-600 font-bold bg-amber-50 px-1 rounded' : 'text-slate-600'}`}>Price: AED {qItem.price}</span>
-                                  </div>
-                                </div>
-                              ) : (
-                                <div className="h-full flex flex-col justify-center gap-2">
-                                  <p className="text-xs font-medium text-rose-500">No match found.</p>
-                                  <select 
-                                    value=""
-                                    onChange={(e) => handleMapItem(po.id, e.target.value)}
-                                    className="text-xs font-bold text-slate-600 bg-slate-100 border border-slate-200 rounded px-1.5 py-1 outline-none cursor-pointer w-full max-w-[150px]"
-                                  >
-                                    <option value="">Select Quote Item</option>
-                                    {quoteData.map(q => <option key={q.id} value={q.id}>{q.sku}</option>)}
-                                  </select>
-                                </div>
-                              )}
-                            </td>
-                            
-                            <td className="p-3 align-middle text-center border-l border-slate-100">
-                              {qItem ? (
-                                isExactMatch ? (
-                                  <span className="inline-flex items-center gap-1 text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded-md border border-emerald-100">
-                                    <CheckCircle2 className="w-3.5 h-3.5" /> Match
-                                  </span>
-                                ) : (
-                                  <div className="flex flex-col items-center gap-2">
-                                    <span className="inline-flex items-center gap-1 text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded-md border border-amber-200">
-                                      <AlertTriangle className="w-3.5 h-3.5" /> Mismatch
-                                    </span>
-                                    <button 
-                                      onClick={() => handleApproveDiscrepancy(po.id)}
-                                      className="text-[10px] font-bold text-indigo-600 hover:text-indigo-800 underline">
-                                      Fix PO
-                                    </button>
-                                  </div>
-                                )
-                              ) : (
-                                <span className="inline-flex items-center gap-1 text-xs font-bold text-rose-600 bg-rose-50 px-2 py-1 rounded-md border border-rose-200">
-                                  <XCircle className="w-3.5 h-3.5" /> Unmapped
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        );
-                      })}
-                    </tbody>
-                  </table>
+          {/* Reference Source Match Card */}
+          <div className="border border-slate-200 rounded-xl p-4 bg-white shadow-xs">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">
+                Matched Master Reference
+              </span>
+              <span className="text-xs font-bold text-emerald-700 flex items-center gap-1 bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                <Check className="w-3.5 h-3.5" /> Rate Agreement Active
+              </span>
+            </div>
+            <div className="flex items-start gap-3 p-3 bg-slate-50 rounded-lg border border-slate-200">
+              <div className="w-8 h-8 rounded-lg bg-indigo-50 flex items-center justify-center text-indigo-600 shrink-0">
+                {activeScenario.referenceDocument.type === 'Price List' && <FileSpreadsheet className="w-4 h-4" />}
+                {activeScenario.referenceDocument.type === 'Quotation' && <MessageSquare className="w-4 h-4" />}
+                {activeScenario.referenceDocument.type === 'Email Quote' && <FileText className="w-4 h-4" />}
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold text-slate-900">{activeScenario.referenceDocument.name}</p>
+                <p className="text-[11px] text-slate-500 mt-0.5 leading-snug">{activeScenario.referenceDocument.description}</p>
+                <span className="inline-block text-[10px] font-mono font-semibold text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded mt-1.5 border border-indigo-100">
+                  Ref Code: {activeScenario.referenceDocument.referenceCode}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Line Item Verification Table */}
+          <div className="border border-slate-200 rounded-xl overflow-hidden shadow-xs">
+            <div className="p-3 bg-slate-50 border-b border-slate-200 flex items-center justify-between">
+              <span className="text-xs font-bold text-slate-700">Line Items Verification ({activeScenario.items.length} Lines)</span>
+              <span className="text-[11px] text-slate-500">Extracted vs Master Rate</span>
+            </div>
+
+            <table className="w-full text-left text-xs border-collapse">
+              <thead>
+                <tr className="border-b border-slate-200 bg-slate-50/50 text-slate-500 text-[10px] font-bold uppercase">
+                  <th className="py-2 px-3">Item Code & Description</th>
+                  <th className="py-2 px-3 text-right">PO Price</th>
+                  <th className="py-2 px-3 text-right">Master Rate</th>
+                  <th className="py-2 px-3 text-center">Status</th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-slate-100">
+                {activeScenario.items.map((item) => (
+                  <tr key={item.id} className="hover:bg-slate-50/80 transition-colors">
+                    <td className="py-3 px-3">
+                      <p className="font-mono font-bold text-slate-900 text-xs">
+                        {item.itemCode}
+                      </p>
+                      {item.customerItemCode && (
+                        <p className="text-[10px] text-amber-700 font-mono">Customer Ref: {item.customerItemCode}</p>
+                      )}
+                      <p className="text-[11px] text-slate-500 truncate max-w-[200px] mt-0.5">{item.description}</p>
+                      <span className="text-[10px] text-slate-400 font-semibold">Qty: {item.qty} units</span>
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-semibold text-slate-700">
+                      AED {item.extractedPrice.toFixed(2)}
+                    </td>
+                    <td className="py-3 px-3 text-right font-mono font-bold text-slate-900">
+                      AED {item.referencePrice.toFixed(2)}
+                    </td>
+                    <td className="py-3 px-3 text-center">
+                      {item.matchStatus === 'matched' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                          <Check className="w-3 h-3" /> Exact
+                        </span>
+                      )}
+                      {item.matchStatus === 'mapped_from_text' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                          <Layers className="w-3 h-3" /> NLP Mapped
+                        </span>
+                      )}
+                      {item.matchStatus === 'cross_referenced' && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                          <ArrowRightLeft className="w-3 h-3" /> Cross-Matched
+                        </span>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          {/* Financial Summary */}
+          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/70 text-xs">
+            <div className="space-y-1 text-right">
+              <div className="flex justify-between text-slate-600">
+                <span>Subtotal:</span>
+                <span className="font-mono font-bold text-slate-800">AED {subtotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              </div>
+              {activeScenario.hasSurcharge && (
+                <div className="flex justify-between text-slate-600">
+                  <span>Surcharge ({activeScenario.surchargePercent}%):</span>
+                  <span className="font-mono font-bold text-slate-800">AED {surchargeAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                 </div>
-              </Card>
-            )}
+              )}
+              {activeScenario.vatRate > 0 && (
+                <div className="flex justify-between text-slate-600">
+                  <span>VAT (5%):</span>
+                  <span className="font-mono font-bold text-slate-800">AED {vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+                </div>
+              )}
+              <div className="flex justify-between border-t border-slate-300 pt-2 text-sm font-black text-slate-900">
+                <span>Total Amount:</span>
+                <span className="font-mono text-indigo-700">AED {grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Commercial Manager Sign-off Box */}
+          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50/50 space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="text-xs font-bold text-slate-800 flex items-center gap-1.5">
+                <UserCheck className="w-4 h-4 text-indigo-600" /> Commercial Manager Sign-off Notes
+              </label>
+              <span className="text-[10px] font-bold text-slate-500">Sign-off Approver: Bhavani Prasad</span>
+            </div>
+            <textarea
+              value={approvalNote}
+              onChange={(e) => setApprovalNote(e.target.value)}
+              rows={2}
+              className="w-full p-2.5 bg-white border border-slate-200 rounded-lg text-xs text-slate-800 focus:border-indigo-500 outline-none transition-all resize-none shadow-xs"
+            />
+          </div>
+
+          {/* Sticky Approval Action Bar */}
+          <div className="pt-2 flex items-center justify-between border-t border-slate-200 mt-auto">
+            <div>
+              <span className="text-xs text-slate-500 font-medium">Approved Sage 300 Amount:</span>
+              <p className="text-base font-black font-mono text-slate-900">
+                AED {grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </p>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Link 
+                to="/document-processing"
+                className="px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 transition-colors"
+              >
+                Cancel
+              </Link>
+              <button 
+                onClick={handleApproveAndPost}
+                className="flex items-center gap-1.5 px-5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-all hover:shadow-md cursor-pointer"
+              >
+                <CheckCircle2 className="w-4 h-4" /> Single-Level Approval & Post to Sage 300
+              </button>
+            </div>
           </div>
         </div>
       </div>

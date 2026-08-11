@@ -1,261 +1,206 @@
 import { useState } from 'react';
-import { Download, Calendar, Filter, BarChart3, TrendingUp, Activity, AlertCircle, ShoppingCart, Users, Package } from 'lucide-react';
+import { Download, BarChart3, Activity, Clock, DollarSign, PackageX, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
-import { LineChart, Line, BarChart, Bar, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip as RechartsTooltip, Legend, ResponsiveContainer } from 'recharts';
 import { DataTable, type Column } from '../components/ui/DataTable';
 
-const tabs = [
-  { id: 'purchase-orders', label: 'Purchase Orders', icon: ShoppingCart },
-  { id: 'sales-orders', label: 'Sales Orders', icon: TrendingUp },
-  { id: 'inventory', label: 'Inventory', icon: Package },
-  { id: 'customers', label: 'Customers', icon: Users },
-  { id: 'processing', label: 'Processing', icon: Activity },
-  { id: 'exceptions', label: 'Exceptions', icon: AlertCircle },
+const clientReportTabs = [
+  { id: 'ocr-status', label: 'OCR Processing Status', icon: Activity },
+  { id: 'pending-approvals', label: 'Pending Approvals', icon: Clock },
+  { id: 'price-differences', label: 'Price Difference Report', icon: DollarSign },
+  { id: 'exceptions', label: 'Exceptions & Errors', icon: ShieldAlert },
+  { id: 'unmatched-items', label: 'Unmatched Item Report', icon: PackageX },
 ];
-
-const poData = [
-  { name: 'Jan', orders: 120, value: 450000 },
-  { name: 'Feb', orders: 135, value: 520000 },
-  { name: 'Mar', orders: 180, value: 750000 },
-  { name: 'Apr', orders: 145, value: 610000 },
-  { name: 'May', orders: 190, value: 820000 },
-  { name: 'Jun', orders: 210, value: 950000 },
-];
-
-const salesData = [
-  { name: 'Q1', target: 1500000, actual: 1720000 },
-  { name: 'Q2', target: 1600000, actual: 1580000 },
-  { name: 'Q3', target: 1800000, actual: 2100000 },
-  { name: 'Q4', target: 2000000, actual: 2450000 },
-];
-
-const inventoryPieData = [
-  { name: 'Electronics', value: 45 },
-  { name: 'Furniture', value: 25 },
-  { name: 'Office', value: 15 },
-  { name: 'Hardware', value: 15 },
-];
-
-const COLORS = ['#6366f1', '#14b8a6', '#f59e0b', '#ec4899'];
-
-
-const getColumnsForTab = (tab: string): Column<any>[] => {
-  switch (tab) {
-    case 'purchase-orders':
-      return [
-        { header: 'Date', accessor: 'date', className: 'text-slate-500' },
-        { header: 'PO Number', accessor: 'po', className: 'font-bold text-indigo-600' },
-        { header: 'Supplier', accessor: 'supplier', className: 'font-semibold text-slate-700' },
-        { header: 'Amount', accessor: 'amount', className: 'font-bold text-slate-800 text-right' },
-        { header: 'Status', accessor: 'status', className: 'text-sm font-medium text-slate-600' }
-      ];
-    case 'sales-orders':
-      return [
-        { header: 'Date', accessor: 'date', className: 'text-slate-500' },
-        { header: 'SO Number', accessor: 'so', className: 'font-bold text-indigo-600' },
-        { header: 'Customer', accessor: 'customer', className: 'font-semibold text-slate-700' },
-        { header: 'Value', accessor: 'value', className: 'font-bold text-emerald-600 text-right' },
-        { header: 'Margin', accessor: 'margin', className: 'font-bold text-slate-500 text-right' }
-      ];
-    case 'inventory':
-      return [
-        { header: 'Category', accessor: 'category', className: 'font-bold text-slate-700' },
-        { header: 'SKU Count', accessor: 'skuCount', className: 'text-slate-600 text-right' },
-        { header: 'Total Value', accessor: 'value', className: 'font-bold text-indigo-600 text-right' },
-        { header: 'Turnover Rate', accessor: 'turnover', className: 'text-sm font-medium text-slate-500' }
-      ];
-    case 'customers':
-      return [
-        { header: 'Customer Name', accessor: 'name', className: 'font-bold text-slate-700' },
-        { header: 'Lifetime Value', accessor: 'lifetimeValue', className: 'font-bold text-emerald-600 text-right' },
-        { header: 'Status', accessor: 'status', className: 'text-slate-600' },
-        { header: 'Tier', accessor: 'tier', className: 'font-semibold text-amber-600' }
-      ];
-    case 'processing':
-      return [
-        { header: 'Date', accessor: 'date', className: 'text-slate-500' },
-        { header: 'Docs Processed', accessor: 'docsProcessed', className: 'font-bold text-slate-700 text-right' },
-        { header: 'OCR Success Rate', accessor: 'ocrSuccess', className: 'font-bold text-emerald-600 text-right' },
-        { header: 'Avg Time/Doc', accessor: 'avgTime', className: 'text-slate-600 text-right' }
-      ];
-    case 'exceptions':
-      return [
-        { header: 'Exception Type', accessor: 'type', className: 'font-bold text-rose-600' },
-        { header: 'Occurrence Count', accessor: 'count', className: 'font-bold text-slate-700 text-right' },
-        { header: 'Avg Resolution Time', accessor: 'avgResolution', className: 'text-slate-600 text-right' },
-        { header: 'Trend', accessor: 'trend', className: 'font-semibold text-slate-500 text-right' }
-      ];
-    default:
-      return [];
-  }
-};
 
 export const Reports = () => {
-  const [activeTab, setActiveTab] = useState(tabs[0].id);
-  
-  const mockTableDataMap: Record<string, any[]> = {
-    'purchase-orders': [
-      { id: '1', date: '2024-03-01', po: 'PO-1001', supplier: 'TechNova', amount: 'AED 12,500', status: 'Completed' },
-      { id: '2', date: '2024-03-02', po: 'PO-1002', supplier: 'Global Logistics', amount: 'AED 8,200', status: 'Pending' },
-      { id: '3', date: '2024-03-03', po: 'PO-1003', supplier: 'Office Plus', amount: 'AED 1,500', status: 'Completed' },
-      { id: '4', date: '2024-03-04', po: 'PO-1004', supplier: 'Nexus Hardware', amount: 'AED 45,000', status: 'In Transit' },
-    ],
-    'sales-orders': [
-      { id: '1', date: '2024-03-01', so: 'SO-9921', customer: 'Alpha Corp', value: 'AED 15,000', margin: '22%' },
-      { id: '2', date: '2024-03-02', so: 'SO-9922', customer: 'Beta LLC', value: 'AED 8,500', margin: '18%' },
-      { id: '3', date: '2024-03-03', so: 'SO-9923', customer: 'Gamma Inc', value: 'AED 102,000', margin: '12%' },
-      { id: '4', date: '2024-03-04', so: 'SO-9924', customer: 'Delta Ltd', value: 'AED 4,200', margin: '35%' },
-    ],
-    'inventory': [
-      { id: '1', category: 'Electronics', skuCount: 452, value: 'AED 1.2M', turnover: 'High' },
-      { id: '2', category: 'Furniture', skuCount: 120, value: 'AED 800K', turnover: 'Medium' },
-      { id: '3', category: 'Hardware', skuCount: 890, value: 'AED 500K', turnover: 'Low' },
-    ],
-    'customers': [
-      { id: '1', name: 'Alpha Corp', lifetimeValue: 'AED 450K', status: 'Active', tier: 'Gold' },
-      { id: '2', name: 'Beta LLC', lifetimeValue: 'AED 120K', status: 'Active', tier: 'Silver' },
-      { id: '3', name: 'Delta Ltd', lifetimeValue: 'AED 15K', status: 'Inactive', tier: 'Bronze' },
-    ],
-    'processing': [
-      { id: '1', date: '2024-03-01', docsProcessed: 145, ocrSuccess: '98%', avgTime: '1.2s' },
-      { id: '2', date: '2024-03-02', docsProcessed: 182, ocrSuccess: '97%', avgTime: '1.5s' },
-      { id: '3', date: '2024-03-03', docsProcessed: 95, ocrSuccess: '99%', avgTime: '1.0s' },
-    ],
-    'exceptions': [
-      { id: '1', type: 'Pricing Mismatch', count: 45, avgResolution: '2.5 hrs', trend: '+5%' },
-      { id: '2', type: 'Missing Fields', count: 120, avgResolution: '0.5 hrs', trend: '-12%' },
-      { id: '3', type: 'ERP Sync Fail', count: 12, avgResolution: '4.0 hrs', trend: '+2%' },
-    ]
+  const [activeTab, setActiveTab] = useState('ocr-status');
+
+  // 1. OCR Processing Status
+  const ocrData = [
+    { id: '1', doc: 'PO 4517145590 - Infratech.pdf', customer: 'EATON FZE', status: 'Success (100%)', duration: '0.8s', ocrScore: '99.4%', date: '12/05/2026 10:45 AM' },
+    { id: '2', doc: 'PO-1 - Verger Delporte.pdf', customer: 'VERGER DELPORTE UAE', status: 'Success (100%)', duration: '0.6s', ocrScore: '99.1%', date: '10/07/2026 09:15 AM' },
+    { id: '3', doc: 'Quotation_Email_PO00670.eml', customer: 'CAN SERV OIL & GAS', status: 'Processed with Note', duration: '1.2s', ocrScore: '94.8%', date: '04/05/2026 03:55 PM' },
+    { id: '4', doc: 'PO_Encom_Trading_7296.pdf', customer: 'ENCOM TRADING LLC', status: 'Success (100%)', duration: '0.7s', ocrScore: '97.2%', date: '02/05/2026 11:30 AM' },
+  ];
+
+  // 2. Pending Approvals
+  const approvalData = [
+    { id: '1', po: '4517145590', customer: 'EATON FZE', value: 'AED 64,682.00', matchMethod: 'Tier 2 Price List', approver: 'Bhavani Prasad', priority: 'Standard' },
+    { id: '2', po: 'PO-VD-44192', customer: 'VERGER DELPORTE', value: 'AED 28,831.00', matchMethod: 'Quotation ENQ-26-E-0164', approver: 'Bhavani Prasad', priority: 'Standard' },
+    { id: '3', po: 'PO-CSO-9912', customer: 'CAN SERV OIL', value: 'AED 107,152.00', matchMethod: 'Email Quote Match', approver: 'Bhavani Prasad', priority: 'High' },
+  ];
+
+  // 3. Price Differences
+  const priceDiffData = [
+    { id: '1', po: 'PO-VD-44192', item: 'IFC86/200+MP', poPrice: 'AED 315.00', quotePrice: 'AED 315.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
+    { id: '2', po: '4517145590', item: 'XPSN22510B', poPrice: 'AED 1,064.00', quotePrice: 'AED 1,064.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
+    { id: '3', po: 'PO-EN-7296', item: 'INF-ENC-2R16M', poPrice: 'AED 460.00', quotePrice: 'AED 460.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
+  ];
+
+  // 4. Exceptions & Errors
+  const exceptionData = [
+    { id: '1', po: 'PO-CSO-9912', error: 'Unmapped Item Description', detail: 'Email text has no SKU. Cross-mapped to INF-DB-2000-1423-A', severity: 'Info', status: 'Auto-Resolved' },
+    { id: '2', po: 'PO-EN-7296', error: 'Payment Terms Cross-Check', detail: '30 Days Credit approved per Master DB', severity: 'Info', status: 'Approved' },
+  ];
+
+  // 5. Unmatched Items
+  const unmatchedData = [
+    { id: '1', po: 'PO-CSO-9912', rawText: '2000H x 1423W x 331D Distribution Panel Enclosure', mappedCode: 'INF-DB-2000-1423-A', confidence: '94.8%', action: 'Rule Saved' },
+  ];
+
+  const getColumns = (): Column<any>[] => {
+    switch (activeTab) {
+      case 'ocr-status':
+        return [
+          { header: 'File Name', accessor: 'doc', className: 'font-mono text-xs font-bold text-indigo-700' },
+          { header: 'Customer', accessor: 'customer', className: 'font-bold text-slate-800 text-xs' },
+          { header: 'OCR Confidence', accessor: 'ocrScore', className: 'font-mono font-bold text-emerald-600 text-xs' },
+          { header: 'Processing Time', accessor: 'duration', className: 'text-xs text-slate-500' },
+          { header: 'Ingestion Time', accessor: 'date', className: 'text-xs text-slate-500' },
+          { 
+            header: 'Status', 
+            accessor: (row) => (
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                <CheckCircle2 className="w-3 h-3" /> {row.status}
+              </span>
+            ) 
+          }
+        ];
+      case 'pending-approvals':
+        return [
+          { header: 'PO Ref', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
+          { header: 'Customer', accessor: 'customer', className: 'font-bold text-slate-800 text-xs' },
+          { header: 'Order Value', accessor: 'value', className: 'font-mono font-bold text-slate-900 text-xs' },
+          { header: 'Match Rule', accessor: 'matchMethod', className: 'text-xs text-slate-600 font-semibold' },
+          { header: 'Assigned Approver', accessor: 'approver', className: 'text-xs text-slate-700' },
+          { 
+            header: 'Priority', 
+            accessor: (row) => (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
+                {row.priority}
+              </span>
+            ) 
+          }
+        ];
+      case 'price-differences':
+        return [
+          { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
+          { header: 'Item Code', accessor: 'item', className: 'font-mono text-xs font-bold text-slate-800' },
+          { header: 'PO Unit Price', accessor: 'poPrice', className: 'font-mono text-xs text-slate-700' },
+          { header: 'Contract/Quote Rate', accessor: 'quotePrice', className: 'font-mono text-xs font-bold text-slate-900' },
+          { header: 'Calculated Variance', accessor: 'variance', className: 'font-mono text-xs font-bold text-emerald-600' },
+          { 
+            header: 'Result', 
+            accessor: () => (
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                Verified
+              </span>
+            ) 
+          }
+        ];
+      case 'exceptions':
+        return [
+          { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
+          { header: 'Exception Category', accessor: 'error', className: 'font-bold text-slate-800 text-xs' },
+          { header: 'Resolution Details', accessor: 'detail', className: 'text-xs text-slate-600' },
+          { 
+            header: 'Severity', 
+            accessor: (row) => (
+              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
+                {row.severity}
+              </span>
+            ) 
+          },
+          { 
+            header: 'Status', 
+            accessor: (row) => (
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                {row.status}
+              </span>
+            ) 
+          }
+        ];
+      case 'unmatched-items':
+        return [
+          { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
+          { header: 'Extracted Freeform Description', accessor: 'rawText', className: 'text-xs text-slate-700' },
+          { header: 'Mapped ERP Item Code', accessor: 'mappedCode', className: 'font-mono font-bold text-indigo-700 text-xs' },
+          { header: 'Match Confidence', accessor: 'confidence', className: 'font-mono font-bold text-emerald-600 text-xs' },
+          { 
+            header: 'System Action', 
+            accessor: (row) => (
+              <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                {row.action}
+              </span>
+            ) 
+          }
+        ];
+      default:
+        return [];
+    }
   };
 
-  const currentTableData = mockTableDataMap[activeTab] || [];
-  const currentColumns = getColumnsForTab(activeTab);
+  const getTableData = () => {
+    switch (activeTab) {
+      case 'ocr-status': return ocrData;
+      case 'pending-approvals': return approvalData;
+      case 'price-differences': return priceDiffData;
+      case 'exceptions': return exceptionData;
+      case 'unmatched-items': return unmatchedData;
+      default: return [];
+    }
+  };
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
-      {/* Global Header & Filters */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-5 animate-in fade-in duration-300 pb-8">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <BarChart3 className="w-8 h-8 text-indigo-500" /> Analytics Hub
+          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
+            <BarChart3 className="w-6 h-6 text-indigo-600" /> Commercial Reports & Audit Hub
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Comprehensive reporting and data visualization.</p>
+          <p className="text-xs text-slate-500 mt-0.5">
+            Operational analytics covering OCR accuracy, pending commercial approvals, price differences, and exceptions.
+          </p>
         </div>
-        <div className="flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 px-4 py-2 bg-white border border-slate-200 rounded-xl shadow-sm">
-            <Calendar className="w-4 h-4 text-slate-400" />
-            <select className="text-sm font-medium text-slate-700 bg-transparent outline-none cursor-pointer">
-              <option>Last 30 Days</option>
-              <option>This Quarter</option>
-              <option>This Year</option>
-              <option>Custom Range...</option>
-            </select>
-          </div>
-          <button className="flex items-center gap-2 px-4 py-2 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5">
-            <Download className="w-4 h-4" /> Export Report
-          </button>
-        </div>
+        <button className="flex items-center gap-2 px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 shadow-xs">
+          <Download className="w-3.5 h-3.5 text-slate-400" /> Export CSV
+        </button>
       </div>
 
-      {/* Tabs */}
-      <div className="inline-flex items-center p-1.5 bg-white/60 backdrop-blur-md border border-slate-200/80 rounded-2xl overflow-x-auto max-w-full shadow-sm custom-scrollbar">
-        {tabs.map((tab) => {
+      {/* 5 Client Report Tabs */}
+      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+        {clientReportTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
           return (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all duration-300 ${
-                isActive 
-                  ? 'bg-white text-indigo-700 shadow-md ring-1 ring-slate-900/5 scale-105' 
-                  : 'text-slate-500 hover:text-slate-800 hover:bg-white/50'
+              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+                isActive
+                  ? 'bg-slate-900 text-white shadow-xs'
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
               }`}
             >
-              <Icon className={`w-4 h-4 transition-colors ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} /> 
-              {tab.label}
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-400' : 'text-slate-400'}`} />
+              <span>{tab.label}</span>
             </button>
-          )
+          );
         })}
       </div>
 
-      {/* Dynamic Content based on Active Tab */}
-      <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-        {/* Main Chart Area */}
-        <Card className="xl:col-span-2 flex flex-col min-h-[400px]">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/50 flex flex-row items-center justify-between py-4">
-            <CardTitle>
-              {activeTab === 'purchase-orders' && 'PO Volume Trend'}
-              {activeTab === 'sales-orders' && 'Sales Performance (Actual vs Target)'}
-              {activeTab === 'inventory' && 'Inventory Valuation Trend'}
-              {['customers', 'processing', 'exceptions'].includes(activeTab) && 'Activity Trend'}
-            </CardTitle>
-            <button className="text-slate-400 hover:text-indigo-600"><Filter className="w-4 h-4" /></button>
-          </CardHeader>
-          <CardContent className="p-6 flex-1 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={350}>
-              {activeTab === 'sales-orders' ? (
-                <BarChart data={salesData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} tickFormatter={(value) => `${value / 1000}k`} />
-                  <RechartsTooltip cursor={{ fill: '#f8fafc' }} contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                  <Legend iconType="circle" />
-                  <Bar dataKey="target" name="Target Revenue" fill="#cbd5e1" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="actual" name="Actual Revenue" fill="#6366f1" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              ) : (
-                <LineChart data={poData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
-                  <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                  <YAxis axisLine={false} tickLine={false} tick={{ fill: '#64748b' }} />
-                  <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                  <Legend iconType="circle" />
-                  <Line type="monotone" dataKey="orders" name="Order Volume" stroke="#14b8a6" strokeWidth={3} activeDot={{ r: 8 }} />
-                </LineChart>
-              )}
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-
-        {/* Secondary Chart Area (Pie) */}
-        <Card className="flex flex-col min-h-[400px]">
-          <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
-            <CardTitle>Distribution Breakdown</CardTitle>
-          </CardHeader>
-          <CardContent className="p-6 flex-1 flex items-center justify-center">
-            <ResponsiveContainer width="100%" height={300}>
-              <PieChart>
-                <Pie data={inventoryPieData} cx="50%" cy="50%" innerRadius={60} outerRadius={100} paddingAngle={5} dataKey="value" stroke="none">
-                  {inventoryPieData.map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                  ))}
-                </Pie>
-                <RechartsTooltip contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1)' }} />
-                <Legend verticalAlign="bottom" height={36} iconType="circle" />
-              </PieChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Detailed Data Table */}
-      <Card>
-        <CardHeader className="border-b border-slate-100 bg-slate-50/50 py-4">
-          <CardTitle>Detailed Report Data</CardTitle>
+      {/* Table Card */}
+      <Card className="shadow-sm border-slate-200">
+        <CardHeader className="py-3 px-4 bg-slate-50/70 border-b border-slate-200 flex flex-row items-center justify-between">
+          <CardTitle className="text-xs font-bold text-slate-800 uppercase tracking-wider">
+            {clientReportTabs.find(t => t.id === activeTab)?.label}
+          </CardTitle>
+          <span className="text-[11px] font-mono text-slate-500">Live Infratech Audit Feed</span>
         </CardHeader>
-        <CardContent className="p-0">
-          {currentColumns.length > 0 ? (
-            <DataTable data={currentTableData} columns={currentColumns} keyExtractor={(row) => row.id} />
-          ) : (
-            <div className="p-8 text-center text-slate-500">No columns configured for this report.</div>
-          )}
-          <div className="p-4 border-t border-slate-100 flex items-center justify-center bg-slate-50">
-            <button className="text-sm font-bold text-indigo-600 hover:text-indigo-800 transition-colors">View Full Table</button>
-          </div>
+        <CardContent className="p-0 overflow-hidden flex flex-col">
+          <DataTable data={getTableData()} columns={getColumns()} keyExtractor={(row) => row.id} />
         </CardContent>
       </Card>
-
     </div>
   );
 };

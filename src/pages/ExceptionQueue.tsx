@@ -1,4 +1,4 @@
-import { Search, Filter, AlertCircle, Copy, UserX, PackageX, DollarSign, Layers, Database, RotateCw, CheckCircle2, UserPlus, XCircle } from 'lucide-react';
+import { AlertCircle, Copy, UserX, PackageX, DollarSign, Layers, Database } from 'lucide-react';
 import { DataTable, type Column } from '../components/ui/DataTable';
 import { Card, CardContent } from '../components/ui/Card';
 import { Link } from 'react-router-dom';
@@ -17,105 +17,74 @@ interface ExceptionItem {
 }
 
 const mockExceptions: ExceptionItem[] = [
-  { id: '1', type: 'Pricing Validation', customer: 'TechNova Solutions', poNumber: 'PO-2024-001', status: 'Unassigned', priority: 'High', severity: 'Critical', assignedUser: '-', createdDate: '2024-03-15 09:30 AM', details: 'Unit price mismatch on Item SKU-8921. PO Price: AED 6,500. System Price: AED 8,500.' },
-  { id: '2', type: 'Mandatory Fields', customer: 'Global Logistics Corp', poNumber: 'PO-2024-002', status: 'In Progress', priority: 'Medium', severity: 'Warning', assignedUser: 'Sarah Jenkins', createdDate: '2024-03-15 10:15 AM', details: 'Missing Billing Address and Tax ID on the extracted document.' },
-  { id: '3', type: 'Duplicate PO', customer: 'Apex Office Supplies', poNumber: 'PO-2024-003', status: 'Unassigned', priority: 'Low', severity: 'Info', assignedUser: '-', createdDate: '2024-03-15 11:45 AM', details: 'PO Number already exists in the system for this customer.' },
-  { id: '4', type: 'Item Validation', customer: 'Nexus Hardware', poNumber: 'PO-2024-004', status: 'Resolved', priority: 'High', severity: 'Warning', assignedUser: 'Ahmed Al-Farsi', createdDate: '2024-03-14 02:20 PM', details: 'Unknown Item Code extracted: ITM-9999. Needs manual mapping.' },
-  { id: '5', type: 'ERP Validation', customer: 'Quantum Dynamics', poNumber: 'PO-2024-005', status: 'Failed Sync', priority: 'High', severity: 'Critical', assignedUser: 'System', createdDate: '2024-03-14 04:00 PM', details: 'Connection timeout while pushing Sales Order to Oracle Netsuite.' },
+  { id: '1', type: 'Pricing Verification', customer: 'M/s. EATON FZE', poNumber: '4517145590', status: 'Resolved', priority: 'High', severity: 'Info', assignedUser: 'Bhavani Prasad', createdDate: '2026-05-12 10:45 AM', details: 'Auto-verified with Tier 2 xPower Price List Rev 1.5. Unit prices match.' },
+  { id: '2', type: 'Surcharge Computation', customer: 'M/s. Verger Delporte UAE Ltd', poNumber: 'PO-VD-44192', status: 'Resolved', priority: 'Medium', severity: 'Info', assignedUser: 'Bhavani Prasad', createdDate: '2026-07-10 09:15 AM', details: '10% Ex-works factory surcharge (AED 2,621.00) calculated per Quotation ENQ-26-E-0164.' },
+  { id: '3', type: 'Freeform Description NLP', customer: 'M/s. CAN SERV OIL & GAS', poNumber: 'PO-CSO-9912', status: 'Resolved', priority: 'Medium', severity: 'Warning', assignedUser: 'Bhavani Prasad', createdDate: '2026-05-04 03:55 PM', details: 'Freeform panel text mapped to Infratech SKU INF-DB-2000-1423-A.' },
+  { id: '4', type: 'Customer Part Cross-Match', customer: 'M/s. ENCOM TRADING LLC', poNumber: 'PO-EN-7296', status: 'Resolved', priority: 'Low', severity: 'Info', assignedUser: 'Sarah Jenkins', createdDate: '2026-05-02 11:30 AM', details: 'Customer code ER-ENC-200 mapped to Infratech SKU INF-ENC-2R16M.' },
+  { id: '5', type: 'ERP Sync Queue', customer: 'M/s. Al Shariq Switchgear', poNumber: 'PO-AS-10492', status: 'In Progress', priority: 'High', severity: 'Warning', assignedUser: 'Ahmed Al-Farsi', createdDate: '2026-07-15 02:20 PM', details: 'Awaiting commercial manager approval prior to Sage 300 creation.' },
 ];
 
 const validationMetrics = [
-  { title: 'Mandatory Fields', count: 12, icon: AlertCircle, color: 'text-rose-500', bg: 'bg-rose-50' },
-  { title: 'Duplicate PO', count: 3, icon: Copy, color: 'text-amber-500', bg: 'bg-amber-50' },
-  { title: 'Customer Validation', count: 8, icon: UserX, color: 'text-indigo-500', bg: 'bg-indigo-50' },
-  { title: 'Item Validation', count: 24, icon: PackageX, color: 'text-blue-500', bg: 'bg-blue-50' },
-  { title: 'Pricing Validation', count: 15, icon: DollarSign, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-  { title: 'Quantity Validation', count: 5, icon: Layers, color: 'text-purple-500', bg: 'bg-purple-50' },
-  { title: 'ERP Validation', count: 2, icon: Database, color: 'text-slate-500', bg: 'bg-slate-100' },
+  { title: 'Contract Match', count: 18, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  { title: 'Quote Linked', count: 24, icon: Copy, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+  { title: 'NLP Mapped', count: 8, icon: Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
+  { title: 'Customer SKUs', count: 12, icon: PackageX, color: 'text-amber-600', bg: 'bg-amber-50' },
+  { title: 'VAT Validated', count: 52, icon: AlertCircle, color: 'text-purple-600', bg: 'bg-purple-50' },
+  { title: 'Credit Terms', count: 45, icon: UserX, color: 'text-slate-600', bg: 'bg-slate-100' },
+  { title: 'Sage 300 Synced', count: 62, icon: Database, color: 'text-emerald-600', bg: 'bg-emerald-50' },
 ];
 
 export const ExceptionQueue = () => {
 
   const columns: Column<ExceptionItem>[] = [
     { 
-      header: 'Exception Type', 
-      accessor: (row) => {
-        const isError = row.type === 'ERP Validation' || row.type === 'Pricing Validation';
-        return (
-          <div className="flex flex-col">
-            <span className={`font-bold ${isError ? 'text-rose-600' : 'text-slate-800'}`}>{row.type}</span>
-            <span className="text-xs text-slate-500 truncate max-w-[200px]" title={row.details}>{row.details}</span>
-          </div>
-        );
-      } 
-    },
-    { header: 'Customer', accessor: 'customer', className: 'font-semibold text-slate-700' },
-    { 
-      header: 'PO Number', 
+      header: 'Workflow Verification Type', 
       accessor: (row) => (
-        <Link to={`/purchase-orders/${row.poNumber}`} className="font-bold text-indigo-600 hover:text-indigo-800 hover:underline">
+        <div className="flex flex-col">
+          <span className="font-bold text-slate-900 text-xs">{row.type}</span>
+          <span className="text-[11px] text-slate-500 truncate max-w-[240px]" title={row.details}>{row.details}</span>
+        </div>
+      ) 
+    },
+    { header: 'Customer', accessor: 'customer', className: 'font-semibold text-slate-800 text-xs' },
+    { 
+      header: 'Customer PO Number', 
+      accessor: (row) => (
+        <Link to={`/document-processing/${row.poNumber}`} className="font-bold font-mono text-indigo-600 hover:text-indigo-800 hover:underline text-xs">
           {row.poNumber}
         </Link>
       ) 
     },
     { 
-      header: 'Status', 
+      header: 'Resolution Status', 
       accessor: (row) => {
         let color = 'text-slate-600 bg-slate-100 border-slate-200';
-        if (row.status === 'Unassigned') color = 'text-amber-600 bg-amber-50 border-amber-200';
-        if (row.status === 'In Progress') color = 'text-blue-600 bg-blue-50 border-blue-200';
-        if (row.status === 'Resolved') color = 'text-emerald-600 bg-emerald-50 border-emerald-200';
-        if (row.status === 'Failed Sync') color = 'text-rose-600 bg-rose-50 border-rose-200';
+        if (row.status === 'In Progress') color = 'text-blue-700 bg-blue-50 border-blue-200';
+        if (row.status === 'Resolved') color = 'text-emerald-700 bg-emerald-50 border-emerald-200';
         
         return (
-          <span className={`inline-flex px-2.5 py-1 rounded-md text-xs font-bold border ${color} shadow-sm whitespace-nowrap`}>
+          <span className={`inline-flex px-2.5 py-0.5 rounded-md text-xs font-bold border ${color} shadow-xs whitespace-nowrap`}>
             {row.status}
           </span>
         );
       } 
     },
-    {
-      header: 'Priority/Severity',
-      accessor: (row) => (
-        <div className="flex gap-2">
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
-            row.priority === 'High' ? 'border-rose-200 text-rose-600 bg-rose-50' : (row.priority === 'Medium' ? 'border-amber-200 text-amber-600 bg-amber-50' : 'border-slate-200 text-slate-600 bg-slate-50')
-          }`}>
-            {row.priority}
-          </span>
-          <span className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border ${
-            row.severity === 'Critical' ? 'border-purple-200 text-purple-600 bg-purple-50' : (row.severity === 'Warning' ? 'border-amber-200 text-amber-600 bg-amber-50' : 'border-slate-200 text-slate-600 bg-slate-50')
-          }`}>
-            {row.severity}
-          </span>
-        </div>
-      )
-    },
     { 
-      header: 'Assignment', 
+      header: 'Assigned Specialist', 
       accessor: (row) => (
         <div className="flex flex-col">
-          <span className="text-sm font-medium text-slate-700">{row.assignedUser}</span>
-          <span className="text-xs text-slate-400">{row.createdDate}</span>
+          <span className="text-xs font-medium text-slate-800">{row.assignedUser}</span>
+          <span className="text-[10px] text-slate-400">{row.createdDate}</span>
         </div>
       ) 
     },
     { 
-      header: 'Actions', 
-      accessor: () => (
+      header: 'Action', 
+      accessor: (row) => (
         <div className="flex items-center gap-1 justify-end">
-          <button className="p-1.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-md transition-colors" title="Retry Processing">
-            <RotateCw className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 text-slate-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-md transition-colors" title="Resolve Exception">
-            <CheckCircle2 className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 text-slate-400 hover:text-blue-600 hover:bg-blue-50 rounded-md transition-colors" title="Assign User">
-            <UserPlus className="w-4 h-4" />
-          </button>
-          <button className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-md transition-colors" title="Close/Ignore">
-            <XCircle className="w-4 h-4" />
-          </button>
+          <Link to={`/document-processing/${row.poNumber}`} className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold transition-colors">
+            Open Validation
+          </Link>
         </div>
       ),
       className: 'text-right'
@@ -123,12 +92,12 @@ export const ExceptionQueue = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500">
+    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Validation Center</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Monitor system health and resolve processing exceptions.</p>
+          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Order Verification & Exception Center</h1>
+          <p className="text-sm text-slate-500 mt-1 font-medium">Traceability hub for AI cross-referencing, price variance resolutions, and NLP text mappings.</p>
         </div>
       </div>
 
@@ -137,14 +106,14 @@ export const ExceptionQueue = () => {
         {validationMetrics.map((metric, idx) => {
           const Icon = metric.icon;
           return (
-            <Card key={idx} className="hover:-translate-y-1 transition-transform duration-300">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-3">
-                <div className={`p-3 rounded-full ${metric.bg} ${metric.color}`}>
-                  <Icon className="w-6 h-6" />
+            <Card key={idx} className="hover:-translate-y-0.5 transition-transform shadow-xs">
+              <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full gap-2">
+                <div className={`p-2.5 rounded-full ${metric.bg} ${metric.color}`}>
+                  <Icon className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-xs font-bold text-slate-500 uppercase tracking-wider mb-1 leading-tight">{metric.title}</h3>
-                  <p className={`text-2xl font-black ${metric.color}`}>{metric.count}</p>
+                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">{metric.title}</h3>
+                  <p className={`text-xl font-black ${metric.color}`}>{metric.count}</p>
                 </div>
               </CardContent>
             </Card>
@@ -153,54 +122,17 @@ export const ExceptionQueue = () => {
       </div>
 
       {/* Exception Queue Table */}
-      <Card className="flex-1 flex flex-col overflow-hidden">
+      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
         <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row gap-4 justify-between">
           <div className="flex items-center gap-2">
-            <h2 className="text-lg font-bold text-slate-800">Exception Queue</h2>
-            <span className="px-2.5 py-0.5 bg-rose-100 text-rose-700 text-xs font-bold rounded-full">69 Active</span>
-          </div>
-          
-          <div className="flex flex-wrap items-center gap-3">
-            <div className="relative max-w-md w-full group xl:w-64">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 group-focus-within:text-indigo-500 transition-colors" />
-              <input 
-                type="text"
-                placeholder="Search exceptions..."
-                className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-sm font-medium focus:border-indigo-500 focus:ring-2 focus:ring-indigo-100 outline-none transition-all shadow-sm"
-              />
-            </div>
-            <div className="flex items-center gap-2 px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-sm">
-              <Filter className="w-4 h-4 text-slate-400" />
-              <select className="text-sm font-medium text-slate-700 bg-transparent outline-none cursor-pointer">
-                <option value="">All Types</option>
-                <option value="Pricing">Pricing Validation</option>
-                <option value="Item">Item Validation</option>
-                <option value="Mandatory">Mandatory Fields</option>
-              </select>
-            </div>
-            <select className="px-3 py-2 bg-white border border-slate-200 rounded-lg shadow-sm text-sm font-medium text-slate-700 outline-none cursor-pointer">
-              <option value="">All Statuses</option>
-              <option value="Unassigned">Unassigned</option>
-              <option value="In Progress">In Progress</option>
-            </select>
+            <h2 className="text-base font-bold text-slate-800">Verification Ledger</h2>
+            <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">All Scenarios Resolved</span>
           </div>
         </div>
 
         <CardContent className="p-0 overflow-hidden flex flex-col">
           <DataTable data={mockExceptions} columns={columns} keyExtractor={(row) => row.id} />
         </CardContent>
-        
-        {/* Pagination */}
-        <div className="p-4 border-t border-slate-100 flex items-center justify-between text-sm text-slate-500 font-medium bg-slate-50/50 mt-auto">
-          <div>Showing 1 to 5 of 69 entries</div>
-          <div className="flex gap-1">
-            <button className="px-3 py-1 rounded-md hover:bg-slate-200 transition-colors disabled:opacity-50" disabled>Prev</button>
-            <button className="px-3 py-1 rounded-md bg-indigo-600 text-white font-semibold shadow-sm">1</button>
-            <button className="px-3 py-1 rounded-md hover:bg-slate-200 transition-colors">2</button>
-            <button className="px-3 py-1 rounded-md hover:bg-slate-200 transition-colors">3</button>
-            <button className="px-3 py-1 rounded-md hover:bg-slate-200 transition-colors">Next</button>
-          </div>
-        </div>
       </Card>
     </div>
   );
