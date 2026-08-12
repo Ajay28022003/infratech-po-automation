@@ -95,22 +95,22 @@ export const Inventory = () => {
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatisticCard 
           title="Total Stock Value" value="AED 5.8M" trend="+4.2%" isPositive={true} trendLabel="vs last month"
-          icon={DollarSign} colorClass="text-emerald-500" bgClass="bg-emerald-50" borderClass="border-emerald-100" gradientClass="from-emerald-500/20 to-emerald-500/5"
+          icon={DollarSign} colorClass="text-emerald-600" bgClass="bg-emerald-50"
         />
         <StatisticCard 
-          title="Active Switchgear SKUs" value="482" trend="+8 New" isPositive={true} trendLabel="Catalog items"
-          icon={Package} colorClass="text-indigo-500" bgClass="bg-indigo-50" borderClass="border-indigo-100" gradientClass="from-indigo-500/20 to-indigo-500/5"
+          title="Active SKUs" value="482" subtitle="Catalog items"
+          icon={Package} colorClass="text-indigo-600" bgClass="bg-indigo-50"
         />
         <StatisticCard 
-          title="Low Stock Warning" value="4" trend="Replenishment" isPositive={false} trendLabel="Below threshold"
-          icon={AlertTriangle} colorClass="text-amber-500" bgClass="bg-amber-50" borderClass="border-amber-100" gradientClass="from-amber-500/20 to-amber-500/5"
+          title="Low Stock Alert" value="4 Items" subtitle="Below reorder threshold"
+          icon={AlertTriangle} colorClass="text-amber-600" bgClass="bg-amber-50"
         />
         <StatisticCard 
-          title="Out of Stock" value="0" trend="100% Ready" isPositive={true} trendLabel="Zero stockout"
-          icon={XOctagon} colorClass="text-emerald-500" bgClass="bg-emerald-50" borderClass="border-emerald-100" gradientClass="from-emerald-500/20 to-emerald-500/5"
+          title="Out of Stock" value="0 Items" subtitle="No backorders"
+          icon={XOctagon} colorClass="text-emerald-600" bgClass="bg-emerald-50"
         />
       </div>
 

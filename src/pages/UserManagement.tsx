@@ -102,9 +102,9 @@ export const UserManagement = () => {
 
       {/* KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatisticCard title="Total Team Members" value="6 Active" icon={UserPlus} isPositive={true} trendLabel="Authorized" trend="6 Users" />
-        <StatisticCard title="Commercial Approvers" value="2 Managers" icon={CheckCircle2} colorClass="text-emerald-600" bgClass="bg-emerald-50" isPositive={true} trendLabel="Single-level" trend="Level 1" />
-        <StatisticCard title="Sage 300 Sync Service" value="Connected" icon={Shield} colorClass="text-indigo-600" bgClass="bg-indigo-50" isPositive={true} trendLabel="Company 11975" trend="Live" />
+        <StatisticCard title="Team Members" value="6" subtitle="Active users in organization" icon={UserPlus} />
+        <StatisticCard title="Approvers" value="2" subtitle="Authorized sign-off managers" icon={CheckCircle2} colorClass="text-emerald-600" bgClass="bg-emerald-50" />
+        <StatisticCard title="Sage 300 ERP" value="Connected" subtitle="Company ID: 11975" icon={Shield} colorClass="text-indigo-600" bgClass="bg-indigo-50" />
       </div>
 
       {/* Main Table Card */}

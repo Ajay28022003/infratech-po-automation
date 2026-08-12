@@ -39,39 +39,39 @@ interface NavSection {
 
 const navSections: NavSection[] = [
   {
-    title: 'Core Workflows',
+    title: 'Orders & Sales',
     items: [
       { name: 'Dashboard', path: '/', icon: LayoutDashboard },
-      { name: 'Inbound PO Queue', path: '/document-processing', icon: Files },
+      { name: 'Inbound Orders', path: '/document-processing', icon: Files },
       { name: 'Quotations', path: '/quotations', icon: MessageSquare },
       { name: 'Purchase Orders', path: '/purchase-orders', icon: ShoppingCart },
       { name: 'Sales Orders', path: '/sales-orders', icon: FileText },
     ]
   },
   {
-    title: 'Ingestion & ERP',
+    title: 'Operations & ERP',
     items: [
-      { name: 'Document Collection', path: '/document-collection', icon: DownloadCloud },
-      { name: 'Exception Queue', path: '/exception-queue', icon: AlertCircle },
+      { name: 'Mailbox Listeners', path: '/document-collection', icon: DownloadCloud },
+      { name: 'Exceptions', path: '/exception-queue', icon: AlertCircle },
       { name: 'ERP Gateway', path: '/erp-integration', icon: Network },
       { name: 'Audit Logs', path: '/audit-logs', icon: ClipboardList },
     ]
   },
   {
-    title: 'System & Masters',
+    title: 'Master Data & Admin',
     items: [
       { 
         name: 'Master Data', 
         icon: Database,
         subItems: [
-          { name: 'Master Data Hub', path: '/master-data', icon: Database },
+          { name: 'Overview', path: '/master-data', icon: Database },
           { name: 'Customers', path: '/customers', icon: Users },
           { name: 'Suppliers', path: '/suppliers', icon: Truck },
-          { name: 'Items & Panels', path: '/items', icon: Box },
+          { name: 'Item Master', path: '/items', icon: Box },
           { name: 'Warehouses', path: '/warehouse', icon: Warehouse },
         ]
       },
-      { name: 'Reports & Analytics', path: '/reports', icon: BarChart3 },
+      { name: 'Reports', path: '/reports', icon: BarChart3 },
       { name: 'Settings', path: '/settings', icon: Settings },
       { name: 'User Management', path: '/user-management', icon: UserCog },
     ]

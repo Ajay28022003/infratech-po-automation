@@ -4,11 +4,11 @@ import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card'
 import { DataTable, type Column } from '../components/ui/DataTable';
 
 const clientReportTabs = [
-  { id: 'ocr-status', label: 'OCR Processing Status', icon: Activity },
+  { id: 'ocr-status', label: 'OCR Status', icon: Activity },
   { id: 'pending-approvals', label: 'Pending Approvals', icon: Clock },
-  { id: 'price-differences', label: 'Price Difference Report', icon: DollarSign },
-  { id: 'exceptions', label: 'Exceptions & Errors', icon: ShieldAlert },
-  { id: 'unmatched-items', label: 'Unmatched Item Report', icon: PackageX },
+  { id: 'price-differences', label: 'Price Variances', icon: DollarSign },
+  { id: 'exceptions', label: 'Exceptions', icon: ShieldAlert },
+  { id: 'unmatched-items', label: 'Unmatched Items', icon: PackageX },
 ];
 
 export const Reports = () => {
@@ -53,46 +53,38 @@ export const Reports = () => {
         return [
           { header: 'File Name', accessor: 'doc', className: 'font-mono text-xs font-bold text-indigo-700' },
           { header: 'Customer', accessor: 'customer', className: 'font-bold text-slate-800 text-xs' },
-          { header: 'OCR Confidence', accessor: 'ocrScore', className: 'font-mono font-bold text-emerald-600 text-xs' },
-          { header: 'Processing Time', accessor: 'duration', className: 'text-xs text-slate-500' },
-          { header: 'Ingestion Time', accessor: 'date', className: 'text-xs text-slate-500' },
+          { header: 'Match Score', accessor: 'ocrScore', className: 'font-mono font-bold text-emerald-600 text-xs' },
+          { header: 'Duration', accessor: 'duration', className: 'text-xs text-slate-500' },
+          { header: 'Date', accessor: 'date', className: 'text-xs text-slate-500' },
           { 
             header: 'Status', 
             accessor: (row) => (
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
                 <CheckCircle2 className="w-3 h-3" /> {row.status}
               </span>
-            ) 
+            )
           }
         ];
       case 'pending-approvals':
         return [
-          { header: 'PO Ref', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
+          { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
           { header: 'Customer', accessor: 'customer', className: 'font-bold text-slate-800 text-xs' },
-          { header: 'Order Value', accessor: 'value', className: 'font-mono font-bold text-slate-900 text-xs' },
-          { header: 'Match Rule', accessor: 'matchMethod', className: 'text-xs text-slate-600 font-semibold' },
-          { header: 'Assigned Approver', accessor: 'approver', className: 'text-xs text-slate-700' },
-          { 
-            header: 'Priority', 
-            accessor: (row) => (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-indigo-50 text-indigo-700 border border-indigo-200">
-                {row.priority}
-              </span>
-            ) 
-          }
+          { header: 'Total Value', accessor: 'value', className: 'font-mono font-bold text-slate-900 text-xs' },
+          { header: 'Matching Source', accessor: 'matchMethod', className: 'text-xs text-slate-600' },
+          { header: 'Assigned To', accessor: 'approver', className: 'text-xs text-slate-700 font-semibold' },
         ];
       case 'price-differences':
         return [
           { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
-          { header: 'Item Code', accessor: 'item', className: 'font-mono text-xs font-bold text-slate-800' },
+          { header: 'Item Code', accessor: 'item', className: 'font-mono font-bold text-indigo-700 text-xs' },
           { header: 'PO Unit Price', accessor: 'poPrice', className: 'font-mono text-xs text-slate-700' },
-          { header: 'Contract/Quote Rate', accessor: 'quotePrice', className: 'font-mono text-xs font-bold text-slate-900' },
-          { header: 'Calculated Variance', accessor: 'variance', className: 'font-mono text-xs font-bold text-emerald-600' },
+          { header: 'Quote / Master Price', accessor: 'quotePrice', className: 'font-mono text-xs font-bold text-emerald-600' },
+          { header: 'Variance', accessor: 'variance', className: 'font-mono text-xs text-slate-600' },
           { 
-            header: 'Result', 
-            accessor: () => (
+            header: 'Status', 
+            accessor: (row) => (
               <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                Verified
+                {row.status}
               </span>
             ) 
           }
@@ -100,16 +92,8 @@ export const Reports = () => {
       case 'exceptions':
         return [
           { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
-          { header: 'Exception Category', accessor: 'error', className: 'font-bold text-slate-800 text-xs' },
-          { header: 'Resolution Details', accessor: 'detail', className: 'text-xs text-slate-600' },
-          { 
-            header: 'Severity', 
-            accessor: (row) => (
-              <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-blue-50 text-blue-700 border border-blue-200">
-                {row.severity}
-              </span>
-            ) 
-          },
+          { header: 'Issue Category', accessor: 'error', className: 'font-bold text-slate-800 text-xs' },
+          { header: 'Details', accessor: 'detail', className: 'text-xs text-slate-600' },
           { 
             header: 'Status', 
             accessor: (row) => (
@@ -122,11 +106,11 @@ export const Reports = () => {
       case 'unmatched-items':
         return [
           { header: 'PO Number', accessor: 'po', className: 'font-mono font-bold text-indigo-600 text-xs' },
-          { header: 'Extracted Freeform Description', accessor: 'rawText', className: 'text-xs text-slate-700' },
-          { header: 'Mapped ERP Item Code', accessor: 'mappedCode', className: 'font-mono font-bold text-indigo-700 text-xs' },
-          { header: 'Match Confidence', accessor: 'confidence', className: 'font-mono font-bold text-emerald-600 text-xs' },
+          { header: 'Extracted Description', accessor: 'rawText', className: 'text-xs text-slate-700' },
+          { header: 'Mapped Item Code', accessor: 'mappedCode', className: 'font-mono font-bold text-indigo-700 text-xs' },
+          { header: 'Confidence', accessor: 'confidence', className: 'font-mono font-bold text-emerald-600 text-xs' },
           { 
-            header: 'System Action', 
+            header: 'Action', 
             accessor: (row) => (
               <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
                 {row.action}
@@ -155,9 +139,9 @@ export const Reports = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Commercial Reports & Analytics</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Reports</h1>
           <p className="text-xs text-slate-500 mt-1 font-normal">
-            Operational verification metrics covering OCR accuracy, approvals, price variance reports, and system exceptions.
+            Order verification logs, pricing variances, and exception reports.
           </p>
         </div>
         <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 shadow-2xs transition-all">

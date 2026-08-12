@@ -100,39 +100,31 @@ export const ExceptionQueue = () => {
         <StatisticCard 
           title="Contract Matches" 
           value="18" 
-          trend="100% Rate" 
-          isPositive={true} 
-          trendLabel="Tier 2 Schedule"
+          subtitle="Tier 2 price schedule"
           icon={DollarSign} 
           colorClass="text-indigo-600" 
           bgClass="bg-indigo-50"
         />
         <StatisticCard 
-          title="Quote Cross-Checks" 
+          title="Quote Matches" 
           value="24" 
-          trend="0 Discrepancy" 
-          isPositive={true} 
-          trendLabel="Reference quotes"
+          subtitle="Reference quotation offers"
           icon={Copy} 
           colorClass="text-emerald-600" 
           bgClass="bg-emerald-50"
         />
         <StatisticCard 
-          title="NLP Text Mapped" 
+          title="Text Mapped" 
           value="8" 
-          trend="Saved as rules" 
-          isPositive={true} 
-          trendLabel="Freeform text"
+          subtitle="Learned SKU dictionary rules"
           icon={Layers} 
           colorClass="text-blue-600" 
           bgClass="bg-blue-50"
         />
         <StatisticCard 
-          title="Active Blockers" 
+          title="Active Exceptions" 
           value="0" 
-          trend="All clear" 
-          isPositive={true} 
-          trendLabel="Zero variance"
+          subtitle="No unresolved price variances"
           icon={ShieldCheck} 
           colorClass="text-emerald-600" 
           bgClass="bg-emerald-50"

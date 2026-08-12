@@ -9,8 +9,8 @@ interface InboundPO {
   poNumber: string;
   filename: string;
   customer: string;
-  scenarioType: string;
-  scenarioNum: number;
+  matchType: string;
+  filterKey: string;
   category: 'Price List' | 'Quotation' | 'Email Quote';
   receivedDate: string;
   source: string;
@@ -24,9 +24,9 @@ const inboundPOs: InboundPO[] = [
     id: 'PO-4517145590', 
     poNumber: '4517145590',
     filename: 'PO 4517145590 - Infratech.pdf', 
-    customer: 'M/s. EATON FZE', 
-    scenarioType: 'Scenario 1: Price List Match (Tier 2)',
-    scenarioNum: 1,
+    customer: 'EATON FZE', 
+    matchType: 'Contract Price List (Tier 2)',
+    filterKey: 'contract',
     category: 'Price List',
     receivedDate: 'May 12, 2026 10:45 AM', 
     source: 'invoices@infratech.ae', 
@@ -38,9 +38,9 @@ const inboundPOs: InboundPO[] = [
     id: 'PO-VD-44192', 
     poNumber: 'PO-VD-44192',
     filename: 'PO-1 - Verger Delporte.pdf', 
-    customer: 'M/s. Verger Delporte UAE Ltd', 
-    scenarioType: 'Scenario 2: Quotation Match (Matching Part Refs)',
-    scenarioNum: 2,
+    customer: 'Verger Delporte UAE Ltd', 
+    matchType: 'Quote ENQ-26-E-0164',
+    filterKey: 'quote',
     category: 'Quotation',
     receivedDate: 'Jul 10, 2026 09:15 AM', 
     source: 'orders@infratech.ae', 
@@ -52,9 +52,9 @@ const inboundPOs: InboundPO[] = [
     id: 'PO-CSO-9912', 
     poNumber: 'PO-CSO-9912',
     filename: 'PO.pdf (Can Serv Oil)', 
-    customer: 'M/s. CAN SERV OIL & GAS', 
-    scenarioType: 'Scenario 3: Quotation (Without Part Refs)',
-    scenarioNum: 3,
+    customer: 'Can Serv Oil & Gas', 
+    matchType: 'Email Quote Match',
+    filterKey: 'text',
     category: 'Email Quote',
     receivedDate: 'May 04, 2026 03:55 PM', 
     source: 'bhavani@infratech.ae', 
@@ -66,9 +66,9 @@ const inboundPOs: InboundPO[] = [
     id: 'PO-EN-7296', 
     poNumber: 'PO-EN-7296',
     filename: 'PO.pdf (Encom Trading)', 
-    customer: 'M/s. ENCOM TRADING LLC', 
-    scenarioType: 'Scenario 4: Customer Part Cross-Match',
-    scenarioNum: 4,
+    customer: 'Encom Trading LLC', 
+    matchType: 'Customer Part Cross-Match',
+    filterKey: 'part',
     category: 'Email Quote',
     receivedDate: 'May 02, 2026 11:30 AM', 
     source: 'orders@infratech.ae', 
@@ -79,20 +79,16 @@ const inboundPOs: InboundPO[] = [
 ];
 
 export const DocumentProcessing = () => {
-  const [activeTab, setActiveTab] = useState<'All' | 'Scenario 1' | 'Scenario 2' | 'Scenario 3' | 'Scenario 4'>('All');
+  const [activeTab, setActiveTab] = useState<string>('all');
 
   const filteredPOs = inboundPOs.filter(item => {
-    if (activeTab === 'All') return true;
-    if (activeTab === 'Scenario 1') return item.scenarioNum === 1;
-    if (activeTab === 'Scenario 2') return item.scenarioNum === 2;
-    if (activeTab === 'Scenario 3') return item.scenarioNum === 3;
-    if (activeTab === 'Scenario 4') return item.scenarioNum === 4;
-    return true;
+    if (activeTab === 'all') return true;
+    return item.filterKey === activeTab;
   });
 
   const columns: Column<InboundPO>[] = [
     { 
-      header: 'Customer PO Number', 
+      header: 'Customer PO', 
       accessor: (row) => (
         <div className="flex flex-col">
           <Link 
@@ -106,22 +102,22 @@ export const DocumentProcessing = () => {
       ) 
     },
     { 
-      header: 'Customer & Match Method', 
+      header: 'Customer & Source', 
       accessor: (row) => (
         <div>
           <p className="font-bold text-slate-900 text-xs">{row.customer}</p>
           <div className="flex items-center gap-1.5 mt-0.5">
             {row.category === 'Price List' && <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
             {row.category === 'Quotation' && <MessageSquare className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
-            {row.scenarioNum === 3 && <Layers className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
-            {row.scenarioNum === 4 && <ArrowRightLeft className="w-3.5 h-3.5 text-purple-600 shrink-0" />}
-            <span className="text-[11px] text-slate-600">{row.scenarioType}</span>
+            {row.filterKey === 'text' && <Layers className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
+            {row.filterKey === 'part' && <ArrowRightLeft className="w-3.5 h-3.5 text-purple-600 shrink-0" />}
+            <span className="text-[11px] text-slate-600">{row.matchType}</span>
           </div>
         </div>
       ) 
     },
     { 
-      header: 'Order Value', 
+      header: 'Amount', 
       accessor: (row) => <span className="font-mono font-bold text-slate-900 text-xs">{row.amount}</span> 
     },
     { 
@@ -142,7 +138,7 @@ export const DocumentProcessing = () => {
       ) 
     },
     { 
-      header: 'OCR Score', 
+      header: 'Match Score', 
       accessor: (row) => (
         <span className="px-2 py-0.5 rounded font-mono text-xs font-semibold bg-slate-100 text-slate-700">
           {row.confidence}
@@ -156,9 +152,9 @@ export const DocumentProcessing = () => {
           <Link 
             to={`/document-processing/${row.id}`} 
             className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition-all shadow-2xs"
-            title="Open Document Verification"
+            title="Review Order"
           >
-            <span>Review & Verify</span> <ArrowRight className="w-3 h-3" />
+            <span>Review Order</span> <ArrowRight className="w-3 h-3" />
           </Link>
         </div>
       ),
@@ -172,27 +168,33 @@ export const DocumentProcessing = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Inbound Document Ingestion Queue
+            Inbound Purchase Orders
           </h1>
-          <p className="text-xs text-slate-500 mt-1 font-normal">
-            OCR pipeline cross-checking customer POs against contract price lists, quotation offers, and part dictionaries.
+          <p className="text-xs text-slate-500 mt-0.5">
+            Incoming customer purchase orders matched against contract price lists, quotations, and part dictionaries.
           </p>
         </div>
       </div>
 
       {/* Filter Tabs */}
       <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2 overflow-x-auto">
-        {(['All', 'Scenario 1', 'Scenario 2', 'Scenario 3', 'Scenario 4'] as const).map((tab) => (
+        {[
+          { key: 'all', label: 'All Orders (4)' },
+          { key: 'contract', label: 'Contract Match' },
+          { key: 'quote', label: 'Quote Match' },
+          { key: 'text', label: 'Text Match' },
+          { key: 'part', label: 'Part Mapping' },
+        ].map((tab) => (
           <button
-            key={tab}
-            onClick={() => setActiveTab(tab)}
+            key={tab.key}
+            onClick={() => setActiveTab(tab.key)}
             className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all ${
-              activeTab === tab
+              activeTab === tab.key
                 ? 'bg-slate-900 text-white shadow-2xs'
                 : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
-            {tab === 'All' ? 'All Inbound Orders (4)' : tab}
+            {tab.label}
           </button>
         ))}
       </div>

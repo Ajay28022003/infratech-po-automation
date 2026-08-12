@@ -4,8 +4,9 @@ import {
   CheckCircle2, ArrowLeft,
   FileText, MessageSquare, Layers, ArrowRightLeft,
   ExternalLink, Download, ShieldCheck, Check, Info,
-  AlertTriangle, RefreshCw, Send, ChevronDown
+  AlertTriangle, RefreshCw, Send, ChevronDown, Package, ArrowRight
 } from 'lucide-react';
+import { Modal } from '../components/ui/Modal';
 
 interface LineItem {
   id: string;
@@ -264,6 +265,18 @@ export const DocumentValidation = () => {
   // Interactive Blocker Simulation State
   const [hasSimulatedBlocker, setHasSimulatedBlocker] = useState(false);
   const [blockerResolved, setBlockerResolved] = useState(false);
+  const [isSuccessModalOpen, setIsSuccessModalOpen] = useState(false);
+
+  // Generated Sales Order Number based on Scenario
+  const generatedSalesOrderNumber = useMemo(() => {
+    switch (activeScenario.scenarioNumber) {
+      case 1: return 'SO-S00006715';
+      case 2: return 'SO-S00007526';
+      case 3: return 'SO-S00007469';
+      case 4: return 'SO-S00007296';
+      default: return 'SO-S00006715';
+    }
+  }, [activeScenario]);
 
   // Line items (with simulated price variance if toggled)
   const currentItems = useMemo(() => {
@@ -306,7 +319,7 @@ export const DocumentValidation = () => {
       alert('Cannot post to Sage 300 while a price variance blocker is unresolved. Please resolve or override the discrepancy.');
       return;
     }
-    navigate('/sales-orders');
+    setIsSuccessModalOpen(true);
   };
 
   const handleAutoCorrectRate = () => {
@@ -331,14 +344,13 @@ export const DocumentValidation = () => {
     <div className="w-full h-full flex flex-col bg-slate-100/80 text-slate-900 overflow-hidden font-sans">
       {/* Sleek, Uncongested Top Navigation Bar */}
       <header className="h-14 bg-white border-b border-slate-200 shrink-0 z-20 px-6 flex items-center justify-between shadow-2xs">
-        {/* Left: Clean Breadcrumb & Context */}
         <div className="flex items-center gap-3 min-w-0">
           <Link 
             to="/document-processing" 
-            className="flex items-center gap-1 text-xs font-bold text-slate-500 hover:text-slate-900 px-2 py-1 rounded-md hover:bg-slate-100 transition-colors shrink-0"
+            className="flex items-center gap-1 text-xs font-semibold text-slate-500 hover:text-slate-900 px-2 py-1 rounded-md hover:bg-slate-100 transition-colors shrink-0"
           >
             <ArrowLeft className="w-4 h-4" />
-            <span>Inbound Queue</span>
+            <span>Inbound Orders</span>
           </Link>
 
           <span className="text-slate-300">/</span>
@@ -352,9 +364,7 @@ export const DocumentValidation = () => {
           </div>
         </div>
 
-        {/* Right: Refined Secondary Actions & Primary CTA */}
         <div className="flex items-center gap-3 shrink-0">
-          {/* Compact Scenario Selector Dropdown */}
           <div className="relative">
             <select
               value={currentScenarioKey}
@@ -375,7 +385,6 @@ export const DocumentValidation = () => {
             <ChevronDown className="w-3.5 h-3.5 text-slate-400 absolute right-2 top-1/2 -translate-y-1/2 pointer-events-none" />
           </div>
 
-          {/* Simulate Issue Toggle */}
           <button
             onClick={() => {
               setHasSimulatedBlocker(!hasSimulatedBlocker);
@@ -389,10 +398,9 @@ export const DocumentValidation = () => {
             title="Simulate a price discrepancy blocker"
           >
             <AlertTriangle className={`w-3.5 h-3.5 ${isBlockerActive ? 'text-amber-700' : 'text-slate-400'}`} />
-            <span>{isBlockerActive ? 'Blocker Active' : 'Simulate Issue'}</span>
+            <span>{isBlockerActive ? 'Blocker Active' : 'Simulate Discrepancy'}</span>
           </button>
 
-          {/* Primary Action Button */}
           <button 
             onClick={handleApproveAndPost}
             className={`flex items-center gap-1.5 px-4 py-1.5 text-xs font-bold rounded-lg shadow-2xs transition-all ${
@@ -406,11 +414,8 @@ export const DocumentValidation = () => {
         </div>
       </header>
 
-      {/* Main Split Screen Workspace */}
       <div className="flex-1 flex overflow-hidden w-full">
-        {/* Left Side: Real Raw Document Viewer (50%) */}
         <div className="w-1/2 flex flex-col bg-slate-900 border-r border-slate-300 relative overflow-hidden h-full">
-          {/* Clean Document Switcher Toolbar */}
           <div className="h-10 bg-slate-950 border-b border-slate-800 px-4 flex items-center justify-between z-10 shrink-0">
             <div className="flex items-center gap-2">
               <button
@@ -448,34 +453,33 @@ export const DocumentValidation = () => {
                 href={currentDocUrl} 
                 target="_blank" 
                 rel="noreferrer"
-                className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
-                title="Open in new window"
+                className="p-1 text-slate-400 hover:text-white rounded transition-colors"
+                title="Open in new tab"
               >
                 <ExternalLink className="w-3.5 h-3.5" />
               </a>
               <a 
                 href={currentDocUrl} 
                 download
-                className="p-1 text-slate-400 hover:text-white hover:bg-slate-800 rounded transition-colors"
-                title="Download original document"
+                className="p-1 text-slate-400 hover:text-white rounded transition-colors"
+                title="Download document"
               >
                 <Download className="w-3.5 h-3.5" />
               </a>
             </div>
           </div>
 
-          {/* Genuine Raw Document Content */}
-          <div className="flex-1 w-full h-full bg-slate-900 overflow-hidden relative flex items-center justify-center">
+          <div className="flex-1 bg-slate-900 overflow-hidden relative flex items-center justify-center p-2">
             {isImageFile ? (
-              <div className="w-full h-full overflow-auto flex items-center justify-center p-4 custom-scrollbar bg-slate-950">
+              <div className="w-full h-full overflow-auto flex items-center justify-center p-4 bg-slate-950">
                 <img 
                   src={currentDocUrl} 
-                  alt={currentDocFilename}
-                  className="max-w-full max-h-full object-contain rounded shadow-2xl border border-slate-700 bg-white"
+                  alt={currentDocFilename} 
+                  className="max-w-full max-h-full object-contain rounded shadow-lg border border-slate-700 bg-white"
                 />
               </div>
             ) : (
-              <iframe
+              <iframe 
                 src={`${currentDocUrl}#toolbar=0&navpanes=0&scrollbar=1`}
                 title={currentDocFilename}
                 className="w-full h-full border-none bg-slate-900"
@@ -484,28 +488,24 @@ export const DocumentValidation = () => {
           </div>
         </div>
 
-        {/* Right Side: Commercial Review & Cross-Match Console (50%) */}
         <div className="w-1/2 flex flex-col bg-slate-50 overflow-y-auto custom-scrollbar h-full p-6 space-y-4">
-          
-          {/* Automated Cross-Check Verification Checklist Banner / Blocker Alert */}
           {isBlockerActive ? (
             <div className="bg-amber-50/90 rounded-xl border border-amber-300 p-4 shadow-2xs animate-in fade-in">
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center gap-2 text-amber-900 font-bold text-xs uppercase tracking-wide">
                   <AlertTriangle className="w-4 h-4 text-amber-600" />
-                  <span>Commercial Price Variance Blocker</span>
+                  <span>Price Discrepancy Detected</span>
                 </div>
                 <span className="px-2 py-0.5 bg-amber-200 text-amber-900 text-[10px] font-bold rounded">
                   Posting Paused
                 </span>
               </div>
               <p className="text-xs text-amber-900 leading-relaxed font-medium mb-3">
-                Unit price extracted from PO (AED {currentItems[0].extractedPrice.toFixed(2)}) is lower than Master Contract Rate (AED {currentItems[0].referencePrice.toFixed(2)}) by 15.0%. Posting to Sage 300 is blocked until resolved.
+                Unit price in customer PO (AED {currentItems[0].extractedPrice.toFixed(2)}) is lower than Master Contract Rate (AED {currentItems[0].referencePrice.toFixed(2)}) by 15.0%.
               </p>
 
-              {/* Blocker Resolution Options */}
               <div className="bg-white p-3 rounded-lg border border-amber-200 space-y-2">
-                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Manager Resolution Action:</p>
+                <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Resolution Options:</p>
                 <div className="flex flex-wrap gap-2">
                   <button
                     onClick={handleAutoCorrectRate}
@@ -517,13 +517,13 @@ export const DocumentValidation = () => {
                     onClick={handleOverrideDiscount}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-amber-600 text-white text-xs font-bold rounded-lg hover:bg-amber-700 transition-colors shadow-2xs"
                   >
-                    <Check className="w-3.5 h-3.5" /> Approve Concession & Override
+                    <Check className="w-3.5 h-3.5" /> Approve Concession
                   </button>
                   <button
                     onClick={handleRouteToExceptionQueue}
                     className="flex items-center gap-1.5 px-3 py-1.5 bg-slate-100 text-rose-700 text-xs font-bold rounded-lg hover:bg-rose-50 border border-slate-200 transition-colors"
                   >
-                    <Send className="w-3.5 h-3.5" /> Send to Exception Queue
+                    <Send className="w-3.5 h-3.5" /> Route to Exceptions
                   </button>
                 </div>
               </div>
@@ -534,22 +534,21 @@ export const DocumentValidation = () => {
                 <div className="flex items-center gap-2">
                   <ShieldCheck className="w-4 h-4 text-emerald-600" />
                   <span className="text-xs font-bold text-slate-900 uppercase tracking-wider">
-                    Commercial Cross-Check (5/5 Points Verified)
+                    Order Verification (All Items Matched)
                   </span>
                 </div>
                 <span className="px-2 py-0.5 bg-emerald-50 text-emerald-800 text-[10px] font-bold rounded border border-emerald-200/80">
-                  0 Blockers • Ready for Posting
+                  0 Discrepancies • Ready to Post
                 </span>
               </div>
               <p className="text-xs text-slate-600 leading-relaxed font-normal mb-3">
                 {activeScenario.crossCheckSummary}
               </p>
 
-              {/* 5 Visual Verification Points */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 text-[11px] pt-2.5 border-t border-slate-100">
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Buyer TRN Verified</span>
+                  <span>Buyer TRN Matched</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
@@ -557,25 +556,24 @@ export const DocumentValidation = () => {
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Unit Rates: 0% Variance</span>
+                  <span>Pricing Validated (0% Variance)</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Quantities Validated</span>
+                  <span>Quantities Confirmed</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Surcharges Computed</span>
+                  <span>Tax & Surcharges Calculated</span>
                 </div>
                 <div className="flex items-center gap-1.5 text-slate-700">
                   <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
-                  <span>Ready for Sage 300</span>
+                  <span>Sage 300 Ready</span>
                 </div>
               </div>
             </div>
           )}
 
-          {/* Unified Customer & Master Reference Details Card */}
           <div className="bg-white rounded-xl border border-slate-200/90 p-4 shadow-2xs grid grid-cols-1 md:grid-cols-2 gap-4 text-xs">
             <div>
               <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Buyer & Terms</span>
@@ -584,7 +582,7 @@ export const DocumentValidation = () => {
               <p className="text-slate-700 mt-1">Payment: <strong className="text-indigo-700">{activeScenario.paymentTerms}</strong></p>
             </div>
             <div className="border-t md:border-t-0 md:border-l border-slate-100 md:pl-4 pt-2 md:pt-0">
-              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Cross-Referenced Source</span>
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">Matched Reference</span>
               <p className="font-bold text-slate-900">{activeScenario.referenceDocument.name}</p>
               <span className="inline-block font-mono text-[10px] bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded mt-1">
                 Ref: {activeScenario.referenceDocument.referenceCode}
@@ -593,12 +591,11 @@ export const DocumentValidation = () => {
             </div>
           </div>
 
-          {/* Line Items Side-by-Side Comparison Table */}
           <div className="bg-white rounded-xl border border-slate-200 overflow-hidden shadow-2xs">
             <div className="p-3 border-b border-slate-100 bg-slate-50/70 flex items-center justify-between">
               <div>
                 <h3 className="text-xs font-bold text-slate-800 uppercase tracking-wider">
-                  Line Items Cross-Check ({currentItems.length} Lines)
+                  Line Items ({currentItems.length})
                 </h3>
               </div>
               {isBlockerActive ? (
@@ -754,6 +751,73 @@ export const DocumentValidation = () => {
           </div>
         </div>
       </div>
+
+      {/* Sage 300 Posting Confirmation Modal */}
+      <Modal
+        isOpen={isSuccessModalOpen}
+        onClose={() => setIsSuccessModalOpen(false)}
+        title="Order Posted to Sage 300 ERP"
+        maxWidth="max-w-lg"
+      >
+        <div className="p-6 space-y-5">
+          <div className="flex items-center gap-3 p-3.5 bg-emerald-50 border border-emerald-200 rounded-xl text-emerald-800">
+            <CheckCircle2 className="w-6 h-6 text-emerald-600 shrink-0" />
+            <div>
+              <p className="text-xs font-bold">Sage 300 Order Entry Batch Created</p>
+              <p className="text-[11px] text-emerald-700 mt-0.5">Order has been verified, matched, and committed into Sage 300 database.</p>
+            </div>
+          </div>
+
+          <div className="border border-slate-200 rounded-xl p-4 bg-slate-50 space-y-3 text-xs">
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Sales Order Number:</span>
+              <span className="font-mono font-bold text-indigo-700 text-sm bg-white px-2 py-0.5 rounded border border-slate-200">
+                {generatedSalesOrderNumber}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Customer:</span>
+              <span className="font-bold text-slate-800">{activeScenario.customer}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Customer PO:</span>
+              <span className="font-mono font-semibold text-slate-700">{activeScenario.poNumber}</span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Committed Amount:</span>
+              <span className="font-mono font-bold text-slate-900">
+                AED {grandTotal.toLocaleString('en-US', { minimumFractionDigits: 2 })}
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Warehouse Staging:</span>
+              <span className="font-medium text-slate-800 flex items-center gap-1">
+                <Package className="w-3.5 h-3.5 text-slate-400" /> Ras Al Khaimah Plant 1
+              </span>
+            </div>
+            <div className="flex justify-between items-center">
+              <span className="text-slate-500 font-medium">Approver Sign-off:</span>
+              <span className="font-semibold text-slate-700">Bhavani Prasad (Single-Level)</span>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2.5 pt-3 border-t border-slate-100">
+            <Link
+              to="/document-processing"
+              className="px-4 py-2 text-xs font-semibold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 transition-colors"
+            >
+              Back to Queue
+            </Link>
+            <Link
+              to="/sales-orders"
+              className="flex items-center gap-1.5 px-4 py-2 text-xs font-semibold text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors shadow-2xs"
+            >
+              <span>View in Sales Orders</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 };

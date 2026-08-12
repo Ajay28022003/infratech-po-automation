@@ -31,16 +31,16 @@ interface PurchaseOrder {
   status: string;
   time: string;
   salesOrder: string;
-  scenarioRef: string;
+  sourceType: string;
   totalAmount: string;
 }
 
 const recentPOs: PurchaseOrder[] = [
-  { id: '4517145590', customer: 'M/s. EATON FZE', status: 'Processed', time: '10 mins ago', salesOrder: 'SO-S00006715', scenarioRef: 'Scenario 1: Price List Match', totalAmount: 'AED 64,682.00' },
-  { id: 'PO-VD-44192', customer: 'M/s. Verger Delporte UAE Ltd', status: 'Processed', time: '45 mins ago', salesOrder: 'SO-S00007526', scenarioRef: 'Scenario 2: Quote ENQ-26-E-0164', totalAmount: 'AED 28,831.00' },
-  { id: 'PO-CSO-9912', customer: 'M/s. CAN SERV OIL & GAS', status: 'Processed', time: '1 hr ago', salesOrder: 'SO-S00007469', scenarioRef: 'Scenario 3: NLP Description Match', totalAmount: 'AED 107,152.00' },
-  { id: 'PO-EN-7296', customer: 'M/s. ENCOM TRADING LLC', status: 'Processed', time: '2 hrs ago', salesOrder: 'SO-S00007296', scenarioRef: 'Scenario 4: Customer Part Map', totalAmount: 'AED 520.80' },
-  { id: 'PO-AS-10492', customer: 'M/s. Al Shariq Switchgear', status: 'Pending', time: '3 hrs ago', salesOrder: 'Pending Review', scenarioRef: 'Manual Scan Ingestion', totalAmount: 'AED 42,500.00' },
+  { id: '4517145590', customer: 'EATON FZE', status: 'Processed', time: '10 mins ago', salesOrder: 'SO-S00006715', sourceType: 'Contract Price List', totalAmount: 'AED 64,682.00' },
+  { id: 'PO-VD-44192', customer: 'Verger Delporte UAE Ltd', status: 'Processed', time: '45 mins ago', salesOrder: 'SO-S00007526', sourceType: 'Quote ENQ-26-E-0164', totalAmount: 'AED 28,831.00' },
+  { id: 'PO-CSO-9912', customer: 'Can Serv Oil & Gas', status: 'Processed', time: '1 hr ago', salesOrder: 'SO-S00007469', sourceType: 'Email Quote Match', totalAmount: 'AED 107,152.00' },
+  { id: 'PO-EN-7296', customer: 'Encom Trading LLC', status: 'Processed', time: '2 hrs ago', salesOrder: 'SO-S00007296', sourceType: 'Part Code Mapping', totalAmount: 'AED 520.80' },
+  { id: 'PO-AS-10492', customer: 'Al Shariq Switchgear', status: 'Pending', time: '3 hrs ago', salesOrder: 'Pending Review', sourceType: 'Standard Ingestion', totalAmount: 'AED 42,500.00' },
 ];
 
 const columns: Column<PurchaseOrder>[] = [
@@ -53,19 +53,18 @@ const columns: Column<PurchaseOrder>[] = [
     ) 
   },
   { 
-    header: 'Customer / Buyer', 
+    header: 'Customer', 
     accessor: (row) => (
       <div>
         <p className="font-bold text-slate-900 text-xs">{row.customer}</p>
-        <span className="text-[10px] text-slate-500 font-medium">{row.scenarioRef}</span>
+        <span className="text-[11px] text-slate-500">{row.sourceType}</span>
       </div>
     )
   },
   { 
-    header: 'Order Value', 
-    accessor: (row) => (
-      <span className="font-mono text-xs font-bold text-slate-800">{row.totalAmount}</span>
-    )
+    header: 'Amount', 
+    accessor: 'totalAmount', 
+    className: 'font-mono text-xs font-bold text-slate-800' 
   },
   { 
     header: 'Status', 
@@ -83,16 +82,16 @@ const columns: Column<PurchaseOrder>[] = [
     } 
   },
   { header: 'Received', accessor: 'time', className: 'text-xs text-slate-500' },
-  { header: 'Sage 300 Order', accessor: 'salesOrder', className: 'font-mono text-xs font-semibold text-indigo-700' },
+  { header: 'Sales Order (Sage 300)', accessor: 'salesOrder', className: 'font-mono text-xs font-semibold text-indigo-700' },
 ];
 
-const scenarioCards = [
+const orderCards = [
   { 
-    title: 'Price List Match', 
-    badge: 'Scenario 1',
-    buyer: 'M/s. EATON FZE', 
-    po: '4517145590', 
-    desc: 'Matched directly to Tier 2 Contract Master schedule (excl. tax).',
+    title: 'Contract Price List', 
+    tag: 'Contract',
+    buyer: 'EATON FZE', 
+    po: 'PO 4517145590', 
+    desc: 'Matched against contracted Tier 2 master price list.',
     amount: 'AED 64,682.00',
     path: '/document-processing/PO-4517145590',
     icon: FileSpreadsheet,
@@ -100,32 +99,32 @@ const scenarioCards = [
   },
   { 
     title: 'Quotation Match', 
-    badge: 'Scenario 2',
-    buyer: 'M/s. Verger Delporte UAE', 
+    tag: 'Quote Match',
+    buyer: 'Verger Delporte UAE', 
     po: 'PO-VD-44192', 
-    desc: '8 enclosure models matched to quote ENQ-26-E-0164 + 10% surcharge.',
+    desc: '8 enclosure items matched to Quote ENQ-26-E-0164 (+10% surcharge).',
     amount: 'AED 28,831.00',
     path: '/document-processing/PO-VD-44192',
     icon: MessageSquare,
     tagBg: 'bg-emerald-50 text-emerald-700 border-emerald-200',
   },
   { 
-    title: 'NLP Text Match', 
-    badge: 'Scenario 3',
-    buyer: 'M/s. CAN SERV OIL & GAS', 
+    title: 'Item Text Match', 
+    tag: 'Text Match',
+    buyer: 'Can Serv Oil & Gas', 
     po: 'PO-CSO-9912', 
-    desc: 'Freeform panel dimensions mapped to SKU INF-DB-2000-1423.',
+    desc: 'Description matched to panel SKU INF-DB-2000-1423.',
     amount: 'AED 107,152.00',
     path: '/document-processing/PO-CSO-9912',
     icon: Layers,
     tagBg: 'bg-blue-50 text-blue-700 border-blue-200',
   },
   { 
-    title: 'Part Cross-Match', 
-    badge: 'Scenario 4',
-    buyer: 'M/s. ENCOM TRADING LLC', 
+    title: 'Part Code Cross-Match', 
+    tag: 'Part Map',
+    buyer: 'Encom Trading LLC', 
     po: 'PO-EN-7296', 
-    desc: 'Customer part EG30119 cross-matched to Infratech SKU INF-ENC-2R16M.',
+    desc: 'Customer code EG30119 mapped to SKU INF-ENC-2R16M.',
     amount: 'AED 520.80',
     path: '/document-processing/PO-EN-7296',
     icon: ArrowRightLeft,
@@ -135,15 +134,15 @@ const scenarioCards = [
 
 export const Dashboard = () => {
   return (
-    <div className="space-y-8 animate-in fade-in duration-300 pb-12">
-      {/* Executive Page Header */}
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Commercial Operations Dashboard
+            Dashboard
           </h1>
-          <p className="text-slate-500 mt-1 font-normal text-xs leading-relaxed">
-            Inbound customer PO ingestion, master data cross-referencing, and automated Sage 300 ERP batch posting.
+          <p className="text-slate-500 mt-0.5 text-xs">
+            Customer order processing, quote matching, and Sage 300 ERP sync.
           </p>
         </div>
         <div className="flex items-center gap-2.5">
@@ -154,7 +153,7 @@ export const Dashboard = () => {
             to="/document-processing"
             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all"
           >
-            <Plus className="w-3.5 h-3.5" /> Ingest New PO
+            <Plus className="w-3.5 h-3.5" /> Ingest PO
           </Link>
         </div>
       </div>
@@ -162,62 +161,56 @@ export const Dashboard = () => {
       {/* KPI Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatisticCard 
-          title="Total Inbound Orders" 
+          title="Inbound Orders" 
           value="1,248" 
           trend="+12.5%" 
           isPositive={true} 
-          trendLabel="this month"
+          trendLabel="vs last month"
           icon={ShoppingCart} 
           colorClass="text-indigo-600" 
           bgClass="bg-indigo-50"
         />
         <StatisticCard 
-          title="Auto-Match Accuracy" 
+          title="Matched Rate" 
           value="99.4%" 
-          trend="0.8s avg" 
-          isPositive={true} 
-          trendLabel="OCR engine"
+          subtitle="Quote & contract rate accuracy"
           icon={Zap} 
           colorClass="text-emerald-600" 
           bgClass="bg-emerald-50"
         />
         <StatisticCard 
-          title="Pending Sign-Off" 
-          value="4 Active" 
-          trend="0 Blockers" 
-          isPositive={true} 
-          trendLabel="Ready to post"
+          title="Pending Review" 
+          value="4 Orders" 
+          subtitle="Awaiting manager sign-off"
           icon={ShieldCheck} 
           colorClass="text-blue-600" 
           bgClass="bg-blue-50"
         />
         <StatisticCard 
-          title="Sage 300 Orders Synced" 
-          value="AED 219.2k" 
-          trend="100% Synced" 
-          isPositive={true} 
-          trendLabel="Live gateway"
+          title="ERP Synced Total" 
+          value="AED 219,265" 
+          subtitle="Posted to Sage 300 ERP"
           icon={Package} 
           colorClass="text-purple-600" 
           bgClass="bg-purple-50"
         />
       </div>
 
-      {/* Quick Launch Scenario Workflows */}
+      {/* Active Orders for Review */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-sm font-bold text-slate-900 tracking-tight uppercase">Inbound Document Processing Scenarios</h2>
-            <p className="text-xs text-slate-500">Live test scenarios for commercial matching against price lists, quotations, and part dictionaries</p>
+            <h2 className="text-xs font-bold text-slate-900 uppercase tracking-wider">Orders Ready for Review</h2>
+            <p className="text-xs text-slate-500">Select an order to review line items, pricing, and terms against quotes.</p>
           </div>
           <Link to="/document-processing" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors flex items-center gap-1">
-            <span>View All ({scenarioCards.length})</span>
+            <span>View All ({orderCards.length})</span>
             <ArrowRight className="w-3.5 h-3.5" />
           </Link>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          {scenarioCards.map((sc, idx) => {
+          {orderCards.map((sc, idx) => {
             const Icon = sc.icon;
             return (
               <Link 
@@ -226,25 +219,25 @@ export const Dashboard = () => {
                 className="p-4 rounded-xl bg-white border border-slate-200/80 shadow-2xs hover:shadow-xs hover:border-slate-300 transition-all duration-200 flex flex-col justify-between group"
               >
                 <div>
-                  <div className="flex items-center justify-between mb-2.5">
+                  <div className="flex items-center justify-between mb-2">
                     <span className={`text-[10px] font-bold px-2 py-0.5 rounded border ${sc.tagBg}`}>
-                      {sc.badge}
+                      {sc.tag}
                     </span>
-                    <span className="font-mono text-[11px] font-bold text-slate-700">{sc.amount}</span>
+                    <span className="font-mono text-xs font-bold text-slate-800">{sc.amount}</span>
                   </div>
 
                   <h3 className="text-xs font-bold text-slate-900 group-hover:text-indigo-600 transition-colors flex items-center gap-1.5">
                     <Icon className="w-3.5 h-3.5 text-slate-400 shrink-0" />
-                    <span>{sc.title}</span>
+                    <span>{sc.buyer}</span>
                   </h3>
-                  <p className="text-[11px] text-slate-600 font-semibold mt-1 truncate">{sc.buyer}</p>
-                  <p className="text-[11px] text-slate-400 mt-1 leading-relaxed line-clamp-2">{sc.desc}</p>
+                  <p className="text-[11px] font-mono text-slate-500 mt-0.5">{sc.po}</p>
+                  <p className="text-[11px] text-slate-500 mt-1.5 leading-relaxed line-clamp-2">{sc.desc}</p>
                 </div>
 
                 <div className="pt-3 mt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
-                  <span className="font-mono text-slate-400">{sc.po}</span>
+                  <span className="text-slate-400 font-medium">{sc.title}</span>
                   <span className="font-semibold text-indigo-600 group-hover:translate-x-0.5 transition-transform flex items-center gap-0.5">
-                    Verify & Post →
+                    Review & Post →
                   </span>
                 </div>
               </Link>
@@ -255,12 +248,12 @@ export const Dashboard = () => {
 
       {/* Analytics Charts & Activity */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* PO Processing Volume Chart */}
+        {/* Order Volume Chart */}
         <Card className="lg:col-span-2 shadow-2xs">
           <CardHeader className="flex flex-row items-center justify-between">
             <div>
-              <CardTitle>Inbound PO Processing Volume</CardTitle>
-              <p className="text-xs text-slate-400 mt-0.5">7-day ingestion and verification throughput</p>
+              <CardTitle>Weekly Order Volume</CardTitle>
+              <p className="text-xs text-slate-400 mt-0.5">Orders received and processed over the last 7 days</p>
             </div>
             <span className="text-[11px] font-mono font-semibold bg-slate-100 text-slate-700 px-2 py-0.5 rounded">
               Current Week
@@ -290,11 +283,11 @@ export const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {/* Customer Order Value Distribution */}
+        {/* Revenue by Customer */}
         <Card className="shadow-2xs">
           <CardHeader>
-            <CardTitle>Active Buyer Distribution</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">Commercial volume across active buyers</p>
+            <CardTitle>Revenue by Customer</CardTitle>
+            <p className="text-xs text-slate-400 mt-0.5">Current month volume distribution</p>
           </CardHeader>
           <CardContent className="flex flex-col items-center justify-center">
             <div className="h-52 w-full">
@@ -335,15 +328,15 @@ export const Dashboard = () => {
         </Card>
       </div>
 
-      {/* Recent Inbound Activity */}
+      {/* Recent Activity */}
       <Card className="shadow-2xs">
         <CardHeader className="flex flex-row items-center justify-between">
           <div>
-            <CardTitle>Recent Inbound Customer POs</CardTitle>
-            <p className="text-xs text-slate-400 mt-0.5">Real-time status of ingested purchase orders and Sage 300 sync</p>
+            <CardTitle>Recent Orders</CardTitle>
+            <p className="text-xs text-slate-400 mt-0.5">Latest purchase orders and ERP sync status</p>
           </div>
           <Link to="/document-processing" className="text-xs font-semibold text-indigo-600 hover:text-indigo-800 transition-colors">
-            View All Inbound Queue →
+            View All Orders →
           </Link>
         </CardHeader>
         <CardContent className="p-0 overflow-hidden">

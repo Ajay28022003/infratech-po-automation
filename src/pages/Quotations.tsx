@@ -106,9 +106,9 @@ export const Quotations = () => {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Formal Quotations & Price Schedules</h1>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Quotations & Price Lists</h1>
           <p className="text-xs text-slate-500 mt-1 font-normal">
-            Infratech sales offers, price lists, and reference quotation records for customer PO cross-matching.
+            Approved quotation offers and price schedules used to verify customer orders.
           </p>
         </div>
         <div className="flex gap-2.5">
@@ -119,7 +119,7 @@ export const Quotations = () => {
             onClick={() => setIsCreateModalOpen(true)}
             className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all"
           >
-            <Plus className="w-3.5 h-3.5" /> Create Quotation Offer
+            <Plus className="w-3.5 h-3.5" /> Create Quotation
           </button>
         </div>
       </div>
@@ -133,7 +133,7 @@ export const Quotations = () => {
               type="text"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search by quote ref (e.g. ENQ-26-E-0164, Can Serv, Encom)..."
+              placeholder="Search by quote ref, customer..."
               className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-indigo-500 outline-none transition-all"
             />
           </div>
