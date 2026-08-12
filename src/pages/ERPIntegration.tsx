@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Network, Server, ShieldCheck, Clock, ArrowRightLeft, CheckCircle2, RefreshCw, FileJson, Activity, Save, ArrowRight } from 'lucide-react';
+import { ArrowRightLeft, CheckCircle2, RefreshCw, FileJson, Activity, Save, ArrowRight } from 'lucide-react';
 import { DataTable, type Column } from '../components/ui/DataTable';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 
@@ -73,82 +73,88 @@ export const ERPIntegration = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <Network className="w-8 h-8 text-indigo-600" /> Sage 300 ERP Live Gateway
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Sage 300 ERP Live Gateway
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Real-time bi-directional connector syncing validated customer POs into Infratech Sage 300 ERP (Company 11975).</p>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Real-time bi-directional connector syncing validated customer POs into Infratech Sage 300 ERP (Company 11975).
+          </p>
         </div>
         <div className="flex gap-2">
           {activeTab === 'monitor' ? (
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all">
-              <RefreshCw className="w-4 h-4 text-slate-400" /> Ping Gateway
+            <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 shadow-2xs transition-all">
+              <RefreshCw className="w-3.5 h-3.5 text-slate-400" /> Ping Gateway
             </button>
           ) : (
-            <button className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5">
-              <Save className="w-4 h-4" /> Save Schema
+            <button className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all">
+              <Save className="w-3.5 h-3.5" /> Save Schema
             </button>
           )}
         </div>
       </div>
 
-      <div className="flex gap-4 border-b border-slate-200">
+      <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2">
         <button 
           onClick={() => setActiveTab('monitor')}
-          className={`px-4 py-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'monitor' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+            activeTab === 'monitor' ? 'bg-slate-900 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
         >
-          <Activity className="w-4 h-4" /> Sage 300 API Transactions
+          <Activity className="w-3.5 h-3.5" /> Sage 300 API Transactions
         </button>
         <button 
           onClick={() => setActiveTab('mapping')}
-          className={`px-4 py-3 text-xs font-bold border-b-2 transition-colors flex items-center gap-2 ${activeTab === 'mapping' ? 'border-indigo-600 text-indigo-600' : 'border-transparent text-slate-500 hover:text-slate-700'}`}
+          className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1.5 ${
+            activeTab === 'mapping' ? 'bg-slate-900 text-white shadow-2xs' : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
+          }`}
         >
-          <ArrowRightLeft className="w-4 h-4" /> Field Schema Mappings
+          <ArrowRightLeft className="w-3.5 h-3.5" /> Field Schema Mappings
         </button>
       </div>
 
       {activeTab === 'monitor' && (
         <div className="space-y-6">
-          {/* System Status Row */}
-          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-4">
-            <div className="rounded-2xl shadow-sm border border-emerald-200 bg-emerald-500 text-white flex flex-col overflow-hidden">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-1.5">
-                <Server className="w-5 h-5 opacity-90" />
-                <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-90">Sage 300 (Co: 11975)</h3>
-                <p className="text-lg font-black">Connected</p>
-              </CardContent>
+          {/* Refined System Status Row */}
+          <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-5 gap-3.5">
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Target ERP</span>
+              <div className="mt-2 flex items-baseline justify-between">
+                <p className="text-sm font-bold text-slate-900">Sage 300 (11975)</p>
+                <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+              </div>
             </div>
-            <div className="rounded-2xl shadow-sm border border-emerald-200 bg-emerald-500 text-white flex flex-col overflow-hidden">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-1.5">
-                <Activity className="w-5 h-5 opacity-90" />
-                <h3 className="text-[10px] font-bold uppercase tracking-wider opacity-90">Gateway Health</h3>
-                <p className="text-lg font-black">100% Online</p>
-              </CardContent>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Gateway Status</span>
+              <div className="mt-2 flex items-baseline justify-between">
+                <p className="text-sm font-bold text-emerald-700">100% Online</p>
+                <span className="text-[11px] font-medium text-slate-400">REST v2</span>
+              </div>
             </div>
-            <Card className="bg-white border-slate-200">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-1.5">
-                <Network className="w-5 h-5 text-indigo-600" />
-                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Middleware</h3>
-                <p className="text-lg font-black text-slate-800">Infratech API</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white border-slate-200">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-1.5">
-                <ShieldCheck className="w-5 h-5 text-emerald-600" />
-                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">OAuth 2.0 Token</h3>
-                <p className="text-lg font-black text-slate-800">Valid</p>
-              </CardContent>
-            </Card>
-            <Card className="bg-white border-slate-200">
-              <CardContent className="p-4 flex flex-col items-center justify-center text-center h-full gap-1.5">
-                <Clock className="w-5 h-5 text-blue-600" />
-                <h3 className="text-[10px] font-bold uppercase tracking-wider text-slate-400">Average Latency</h3>
-                <p className="text-lg font-black text-slate-800 font-mono">0.85s</p>
-              </CardContent>
-            </Card>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Middleware Bridge</span>
+              <div className="mt-2 flex items-baseline justify-between">
+                <p className="text-sm font-bold text-slate-800">Infratech Core</p>
+                <span className="text-[11px] font-mono text-slate-400">v2.4</span>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Security Auth</span>
+              <div className="mt-2 flex items-baseline justify-between">
+                <p className="text-sm font-bold text-slate-800">OAuth 2.0</p>
+                <span className="text-[11px] font-semibold text-emerald-600">Active</span>
+              </div>
+            </div>
+            <div className="bg-white p-4 rounded-xl border border-slate-200/80 shadow-2xs flex flex-col justify-between">
+              <span className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Mean Latency</span>
+              <div className="mt-2 flex items-baseline justify-between">
+                <p className="text-sm font-bold text-slate-900 font-mono">0.85s</p>
+                <span className="text-[11px] font-medium text-emerald-600">Optimal</span>
+              </div>
+            </div>
           </div>
 
           {/* Logs & JSON Viewer Split */}

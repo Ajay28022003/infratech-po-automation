@@ -1,4 +1,4 @@
-import { Download, Shield, MonitorPlay } from 'lucide-react';
+import { Download, MonitorPlay } from 'lucide-react';
 import { DataTable, type Column } from '../components/ui/DataTable';
 import { Card, CardContent } from '../components/ui/Card';
 
@@ -73,23 +73,21 @@ export const AuditLogs = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <Shield className="w-8 h-8 text-indigo-600" /> Commercial Audit Trail & System Logs
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Immutable trace of manager approvals, OCR validations, and Sage 300 ERP postings for Infratech FZ LLC.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Commercial Audit Trail & Logs</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">Immutable audit logs of approvals, OCR ingestion steps, and Sage 300 ERP transactions.</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 shadow-sm transition-all">
-            <Download className="w-4 h-4 text-slate-400" /> Export Audit CSV
+        <div className="flex gap-2.5">
+          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 shadow-2xs transition-all">
+            <Download className="w-3.5 h-3.5 text-slate-400" /> Export Audit CSV
           </button>
         </div>
       </div>
 
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
+      <Card className="shadow-2xs border-slate-200/80">
         <CardContent className="p-0 overflow-hidden flex flex-col">
           <DataTable data={mockAuditData} columns={columns} keyExtractor={(row) => row.id} />
         </CardContent>

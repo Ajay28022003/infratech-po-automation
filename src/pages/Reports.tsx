@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Download, BarChart3, Activity, Clock, DollarSign, PackageX, CheckCircle2, ShieldAlert } from 'lucide-react';
+import { Download, Activity, Clock, DollarSign, PackageX, CheckCircle2, ShieldAlert } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { DataTable, type Column } from '../components/ui/DataTable';
 
@@ -151,24 +151,22 @@ export const Reports = () => {
   };
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300 pb-8">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight flex items-center gap-2">
-            <BarChart3 className="w-6 h-6 text-indigo-600" /> Commercial Reports & Audit Hub
-          </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            Operational analytics covering OCR accuracy, pending commercial approvals, price differences, and exceptions.
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Commercial Reports & Analytics</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Operational verification metrics covering OCR accuracy, approvals, price variance reports, and system exceptions.
           </p>
         </div>
-        <button className="flex items-center gap-2 px-3.5 py-1.5 bg-white border border-slate-200 text-slate-700 text-xs font-bold rounded-lg hover:bg-slate-50 shadow-xs">
+        <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 shadow-2xs transition-all">
           <Download className="w-3.5 h-3.5 text-slate-400" /> Export CSV
         </button>
       </div>
 
       {/* 5 Client Report Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2 overflow-x-auto">
         {clientReportTabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = activeTab === tab.id;
@@ -176,13 +174,13 @@ export const Reports = () => {
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-3 py-1.5 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
-                isActive
-                  ? 'bg-slate-900 text-white shadow-xs'
-                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+              className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all ${
+                isActive 
+                  ? 'bg-slate-900 text-white shadow-2xs' 
+                  : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-400' : 'text-slate-400'}`} />
+              <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
               <span>{tab.label}</span>
             </button>
           );

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, CreditCard, Receipt, Scale, MapPin, Building, Shield, Users } from 'lucide-react';
+import { CreditCard, Receipt, Scale, MapPin, Building, Shield, Users } from 'lucide-react';
 import { Card, CardContent } from '../components/ui/Card';
 import { DataTable, type Column } from '../components/ui/DataTable';
 import { Modal } from '../components/ui/Modal';
@@ -125,28 +125,28 @@ export const MasterData = () => {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <Database className="w-8 h-8 text-indigo-600" /> Infratech Master Data Hub
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Centralized dictionary for Infratech FZ LLC company parameters, UAE tax codes, credit terms, and ERP business partners.
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Master Data Hub</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Centralized dictionary for Infratech company parameters, tax codes, payment terms, and ERP partners.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <button 
             onClick={() => setIsCreateModalOpen(true)}
-            className="px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all">
+            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all"
+          >
             + Add Master Record
           </button>
         </div>
       </div>
 
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
+      <Card className="shadow-2xs border-slate-200/80">
         {/* Horizontal Navigation */}
-        <div className="flex gap-1 overflow-x-auto p-3 border-b border-slate-100 bg-slate-50/50 custom-scrollbar">
+        <div className="flex gap-1.5 overflow-x-auto p-2.5 border-b border-slate-100 bg-slate-50/50 custom-scrollbar">
           {masterTabs.map((tab) => {
             const Icon = tab.icon;
             const isActive = activeTab === tab.id;
@@ -154,13 +154,14 @@ export const MasterData = () => {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold whitespace-nowrap transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive 
-                    ? 'bg-white text-indigo-700 shadow-sm border border-slate-200' 
-                    : 'text-slate-500 hover:bg-slate-100 hover:text-slate-800'
+                    ? 'bg-slate-900 text-white shadow-2xs' 
+                    : 'text-slate-600 hover:bg-slate-100 hover:text-slate-900'
                 }`}
               >
-                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-indigo-600' : 'text-slate-400'}`} /> {tab.label}
+                <Icon className={`w-3.5 h-3.5 ${isActive ? 'text-white' : 'text-slate-400'}`} />
+                <span>{tab.label}</span>
               </button>
             )
           })}

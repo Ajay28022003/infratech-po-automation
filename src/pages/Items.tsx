@@ -106,35 +106,35 @@ export const Items = () => {
   );
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Item Master Catalog</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Master catalog of sheet metal enclosures, switchgear assemblies, and distribution boards for Infratech FZ LLC.
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Item Master Catalog</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Master catalog of sheet metal enclosures, switchgear assemblies, and distribution boards.
           </p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-4 py-2.5 bg-white border border-slate-200 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 hover:border-slate-300 shadow-sm transition-all">
-            <Download className="w-4 h-4 text-slate-400" /> Export Catalog
+        <div className="flex gap-2.5">
+          <button className="flex items-center gap-1.5 px-3.5 py-2 bg-white border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg hover:bg-slate-50 shadow-2xs transition-all">
+            <Download className="w-3.5 h-3.5 text-slate-400" /> Export Catalog
           </button>
           <button 
             onClick={handleCreate}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-lg shadow-indigo-200 transition-all hover:-translate-y-0.5"
+            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all"
           >
-            <Plus className="w-4 h-4" /> Add Item
+            <Plus className="w-3.5 h-3.5" /> Add Item
           </button>
         </div>
       </div>
 
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-4 justify-between">
+      <Card className="shadow-2xs border-slate-200/80">
+        <div className="p-3.5 border-b border-slate-100 bg-slate-50/50 flex flex-col sm:flex-row gap-4 justify-between">
           <div className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input 
               type="text"
-              placeholder="Search by part number (e.g. XPSN22506B, IFC86/200)..."
-              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-indigo-500 outline-none transition-all shadow-xs"
+              placeholder="Search by SKU, Code, or Description..."
+              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-indigo-500 outline-none transition-all"
             />
           </div>
         </div>

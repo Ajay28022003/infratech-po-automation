@@ -114,8 +114,8 @@ export const DocumentProcessing = () => {
             {row.category === 'Price List' && <FileSpreadsheet className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
             {row.category === 'Quotation' && <MessageSquare className="w-3.5 h-3.5 text-indigo-600 shrink-0" />}
             {row.scenarioNum === 3 && <Layers className="w-3.5 h-3.5 text-blue-600 shrink-0" />}
-            {row.scenarioNum === 4 && <ArrowRightLeft className="w-3.5 h-3.5 text-amber-600 shrink-0" />}
-            <span className="text-[10px] font-semibold text-slate-600">{row.scenarioType}</span>
+            {row.scenarioNum === 4 && <ArrowRightLeft className="w-3.5 h-3.5 text-purple-600 shrink-0" />}
+            <span className="text-[11px] text-slate-600">{row.scenarioType}</span>
           </div>
         </div>
       ) 
@@ -129,25 +129,25 @@ export const DocumentProcessing = () => {
       accessor: (row) => (
         <div className="flex flex-col">
           <span className="text-xs text-slate-700 font-mono">{row.source}</span>
-          <span className="text-[10px] text-slate-400">{row.receivedDate}</span>
+          <span className="text-[11px] text-slate-400">{row.receivedDate}</span>
         </div>
       ) 
     },
     { 
       header: 'Status', 
       accessor: (row) => (
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md text-xs font-bold border border-emerald-200 bg-emerald-50 text-emerald-700 shadow-xs">
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold border border-emerald-200 bg-emerald-50 text-emerald-700">
           <CheckCircle2 className="w-3 h-3 text-emerald-600" /> {row.status}
         </span>
       ) 
     },
     { 
-      header: 'OCR Confidence', 
+      header: 'OCR Score', 
       accessor: (row) => (
-        <span className="px-2 py-0.5 rounded font-mono text-xs font-bold bg-slate-100 text-slate-800 border border-slate-200">
+        <span className="px-2 py-0.5 rounded font-mono text-xs font-semibold bg-slate-100 text-slate-700">
           {row.confidence}
         </span>
-      )
+      ) 
     },
     { 
       header: 'Action', 
@@ -155,7 +155,7 @@ export const DocumentProcessing = () => {
         <div className="flex items-center gap-2 justify-end">
           <Link 
             to={`/document-processing/${row.id}`} 
-            className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-bold rounded-lg hover:bg-indigo-700 transition-all shadow-xs"
+            className="flex items-center gap-1 px-3 py-1.5 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 transition-all shadow-2xs"
             title="Open Document Verification"
           >
             <span>Review & Verify</span> <ArrowRight className="w-3 h-3" />
@@ -167,29 +167,29 @@ export const DocumentProcessing = () => {
   ];
 
   return (
-    <div className="space-y-5 animate-in fade-in duration-300 pb-8">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Page Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-black text-slate-900 tracking-tight">
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
             Inbound Document Ingestion Queue
           </h1>
-          <p className="text-xs text-slate-500 mt-0.5">
-            OCR extraction pipeline supporting all 4 client scenarios (Price List, Quote with Part Refs, Quote without Part Refs, and Customer Part Cross-Matching).
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            OCR pipeline cross-checking customer POs against contract price lists, quotation offers, and part dictionaries.
           </p>
         </div>
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center gap-2 border-b border-slate-200 pb-2 overflow-x-auto">
+      <div className="flex items-center gap-1.5 border-b border-slate-200/80 pb-2 overflow-x-auto">
         {(['All', 'Scenario 1', 'Scenario 2', 'Scenario 3', 'Scenario 4'] as const).map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`px-3 py-1.5 text-xs font-bold rounded-lg whitespace-nowrap transition-all ${
+            className={`px-3 py-1.5 text-xs font-semibold rounded-lg whitespace-nowrap transition-all ${
               activeTab === tab
-                ? 'bg-slate-900 text-white shadow-xs'
-                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-200'
+                ? 'bg-slate-900 text-white shadow-2xs'
+                : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100'
             }`}
           >
             {tab === 'All' ? 'All Inbound Orders (4)' : tab}
@@ -198,7 +198,7 @@ export const DocumentProcessing = () => {
       </div>
 
       {/* Table Card */}
-      <Card className="shadow-sm border-slate-200">
+      <Card className="shadow-2xs border-slate-200/80">
         <CardContent className="p-0 overflow-hidden flex flex-col">
           <DataTable data={filteredPOs} columns={columns} keyExtractor={(row) => row.id} />
         </CardContent>

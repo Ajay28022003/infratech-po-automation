@@ -14,26 +14,38 @@ interface StatisticCardProps {
 }
 
 export const StatisticCard = ({
-  title, value, trend = '0%', isPositive = true, trendLabel = 'vs last month', icon: Icon, colorClass = 'text-indigo-500', bgClass = 'bg-indigo-50', borderClass = 'border-slate-200', gradientClass = 'from-indigo-500/5 to-purple-500/5'
+  title, 
+  value, 
+  trend = '0%', 
+  isPositive = true, 
+  trendLabel = 'vs last month', 
+  icon: Icon,
+  colorClass = 'text-indigo-600',
+  bgClass = 'bg-indigo-50/80',
+  borderClass = 'border-slate-200/80'
 }: StatisticCardProps) => {
   return (
-    <div className={`bg-white p-6 rounded-2xl border ${borderClass} shadow-xl shadow-slate-200/40 hover:shadow-2xl hover:shadow-slate-200/60 transition-all duration-300 hover:-translate-y-1 relative overflow-hidden group cursor-pointer`}>
-      <div className={`absolute top-0 right-0 w-32 h-32 bg-gradient-to-br ${gradientClass} rounded-bl-full -mr-16 -mt-16 transition-transform duration-500 group-hover:scale-110`}></div>
-      <div className="flex justify-between items-start relative z-10">
-        <div>
-          <p className="text-sm font-semibold text-slate-500 mb-1 group-hover:text-slate-700 transition-colors">{title}</p>
-          <h3 className="text-3xl font-extrabold text-slate-800 tracking-tight">{value}</h3>
-        </div>
-        <div className={`p-3 rounded-xl ${bgClass} shadow-inner group-hover:scale-110 transition-transform duration-300`}>
-          <Icon className={`w-6 h-6 ${colorClass}`} />
+    <div className={`bg-white p-5 rounded-xl border ${borderClass} shadow-2xs hover:shadow-xs transition-all duration-200 relative flex flex-col justify-between`}>
+      <div className="flex items-center justify-between">
+        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">{title}</span>
+        <div className={`w-8 h-8 rounded-lg ${bgClass} flex items-center justify-center`}>
+          <Icon className={`w-4 h-4 ${colorClass}`} />
         </div>
       </div>
-      <div className="mt-5 flex items-center text-sm relative z-10">
-        <span className={`flex items-center font-bold px-2 py-1 rounded-md ${isPositive ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-          {isPositive ? <ArrowUpRight className="w-4 h-4 mr-1" /> : <ArrowDownRight className="w-4 h-4 mr-1" />}
-          {trend}
-        </span>
-        <span className="text-slate-400 font-medium ml-3">{trendLabel}</span>
+
+      <div className="mt-3 flex items-baseline justify-between gap-2">
+        <h3 className="text-2xl font-bold text-slate-900 tracking-tight font-mono">{value}</h3>
+        {trend && (
+          <div className="flex items-center gap-1 text-[11px] font-medium">
+            <span className={`inline-flex items-center font-bold px-1.5 py-0.5 rounded ${
+              isPositive ? 'bg-emerald-50 text-emerald-700' : 'bg-rose-50 text-rose-700'
+            }`}>
+              {isPositive ? <ArrowUpRight className="w-3 h-3 mr-0.5" /> : <ArrowDownRight className="w-3 h-3 mr-0.5" />}
+              {trend}
+            </span>
+            <span className="text-slate-400 truncate hidden sm:inline">{trendLabel}</span>
+          </div>
+        )}
       </div>
     </div>
   );

@@ -1,6 +1,7 @@
-import { AlertCircle, Copy, UserX, PackageX, DollarSign, Layers, Database } from 'lucide-react';
+import { Copy, DollarSign, Layers, ShieldCheck, CheckCircle2 } from 'lucide-react';
 import { DataTable, type Column } from '../components/ui/DataTable';
 import { Card, CardContent } from '../components/ui/Card';
+import { StatisticCard } from '../components/ui/StatisticCard';
 import { Link } from 'react-router-dom';
 
 interface ExceptionItem {
@@ -20,18 +21,8 @@ const mockExceptions: ExceptionItem[] = [
   { id: '1', type: 'Pricing Verification', customer: 'M/s. EATON FZE', poNumber: '4517145590', status: 'Resolved', priority: 'High', severity: 'Info', assignedUser: 'Bhavani Prasad', createdDate: '2026-05-12 10:45 AM', details: 'Auto-verified with Tier 2 xPower Price List Rev 1.5. Unit prices match.' },
   { id: '2', type: 'Surcharge Computation', customer: 'M/s. Verger Delporte UAE Ltd', poNumber: 'PO-VD-44192', status: 'Resolved', priority: 'Medium', severity: 'Info', assignedUser: 'Bhavani Prasad', createdDate: '2026-07-10 09:15 AM', details: '10% Ex-works factory surcharge (AED 2,621.00) calculated per Quotation ENQ-26-E-0164.' },
   { id: '3', type: 'Freeform Description NLP', customer: 'M/s. CAN SERV OIL & GAS', poNumber: 'PO-CSO-9912', status: 'Resolved', priority: 'Medium', severity: 'Warning', assignedUser: 'Bhavani Prasad', createdDate: '2026-05-04 03:55 PM', details: 'Freeform panel text mapped to Infratech SKU INF-DB-2000-1423-A.' },
-  { id: '4', type: 'Customer Part Cross-Match', customer: 'M/s. ENCOM TRADING LLC', poNumber: 'PO-EN-7296', status: 'Resolved', priority: 'Low', severity: 'Info', assignedUser: 'Sarah Jenkins', createdDate: '2026-05-02 11:30 AM', details: 'Customer code ER-ENC-200 mapped to Infratech SKU INF-ENC-2R16M.' },
+  { id: '4', type: 'Customer Part Cross-Match', customer: 'M/s. ENCOM TRADING LLC', poNumber: 'PO-EN-7296', status: 'Resolved', priority: 'Low', severity: 'Info', assignedUser: 'Sarah Jenkins', createdDate: '2026-05-02 11:30 AM', details: 'Customer code EG30119 mapped to Infratech SKU INF-ENC-2R16M.' },
   { id: '5', type: 'ERP Sync Queue', customer: 'M/s. Al Shariq Switchgear', poNumber: 'PO-AS-10492', status: 'In Progress', priority: 'High', severity: 'Warning', assignedUser: 'Ahmed Al-Farsi', createdDate: '2026-07-15 02:20 PM', details: 'Awaiting commercial manager approval prior to Sage 300 creation.' },
-];
-
-const validationMetrics = [
-  { title: 'Contract Match', count: 18, icon: DollarSign, color: 'text-emerald-600', bg: 'bg-emerald-50' },
-  { title: 'Quote Linked', count: 24, icon: Copy, color: 'text-indigo-600', bg: 'bg-indigo-50' },
-  { title: 'NLP Mapped', count: 8, icon: Layers, color: 'text-blue-600', bg: 'bg-blue-50' },
-  { title: 'Customer SKUs', count: 12, icon: PackageX, color: 'text-amber-600', bg: 'bg-amber-50' },
-  { title: 'VAT Validated', count: 52, icon: AlertCircle, color: 'text-purple-600', bg: 'bg-purple-50' },
-  { title: 'Credit Terms', count: 45, icon: UserX, color: 'text-slate-600', bg: 'bg-slate-100' },
-  { title: 'Sage 300 Synced', count: 62, icon: Database, color: 'text-emerald-600', bg: 'bg-emerald-50' },
 ];
 
 export const ExceptionQueue = () => {
@@ -46,7 +37,11 @@ export const ExceptionQueue = () => {
         </div>
       ) 
     },
-    { header: 'Customer', accessor: 'customer', className: 'font-semibold text-slate-800 text-xs' },
+    { 
+      header: 'Customer / Buyer', 
+      accessor: 'customer', 
+      className: 'font-semibold text-slate-800 text-xs' 
+    },
     { 
       header: 'Customer PO Number', 
       accessor: (row) => (
@@ -58,13 +53,12 @@ export const ExceptionQueue = () => {
     { 
       header: 'Resolution Status', 
       accessor: (row) => {
-        let color = 'text-slate-600 bg-slate-100 border-slate-200';
-        if (row.status === 'In Progress') color = 'text-blue-700 bg-blue-50 border-blue-200';
-        if (row.status === 'Resolved') color = 'text-emerald-700 bg-emerald-50 border-emerald-200';
-        
+        const isResolved = row.status === 'Resolved';
         return (
-          <span className={`inline-flex px-2.5 py-0.5 rounded-md text-xs font-bold border ${color} shadow-xs whitespace-nowrap`}>
-            {row.status}
+          <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded text-xs font-semibold border ${
+            isResolved ? 'text-emerald-700 bg-emerald-50 border-emerald-200' : 'text-blue-700 bg-blue-50 border-blue-200'
+          }`}>
+            <CheckCircle2 className="w-3 h-3" /> {row.status}
           </span>
         );
       } 
@@ -82,7 +76,7 @@ export const ExceptionQueue = () => {
       header: 'Action', 
       accessor: (row) => (
         <div className="flex items-center gap-1 justify-end">
-          <Link to={`/document-processing/${row.poNumber}`} className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded text-xs font-bold transition-colors">
+          <Link to={`/document-processing/${row.poNumber}`} className="px-2.5 py-1 bg-indigo-50 hover:bg-indigo-100 text-indigo-700 rounded-lg text-xs font-semibold transition-colors border border-indigo-100">
             Open Validation
           </Link>
         </div>
@@ -92,42 +86,66 @@ export const ExceptionQueue = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Order Verification & Exception Center</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Traceability hub for AI cross-referencing, price variance resolutions, and NLP text mappings.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">Order Verification & Exception Ledger</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">Audit ledger for price variance resolutions, custom part mappings, and AI cross-referencing exceptions.</p>
         </div>
       </div>
 
-      {/* Validation Dashboard Grid */}
-      <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-7 gap-4">
-        {validationMetrics.map((metric, idx) => {
-          const Icon = metric.icon;
-          return (
-            <Card key={idx} className="hover:-translate-y-0.5 transition-transform shadow-xs">
-              <CardContent className="p-3 flex flex-col items-center justify-center text-center h-full gap-2">
-                <div className={`p-2.5 rounded-full ${metric.bg} ${metric.color}`}>
-                  <Icon className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-wider leading-tight">{metric.title}</h3>
-                  <p className={`text-xl font-black ${metric.color}`}>{metric.count}</p>
-                </div>
-              </CardContent>
-            </Card>
-          )
-        })}
+      {/* 4 Focused Metrics */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <StatisticCard 
+          title="Contract Matches" 
+          value="18" 
+          trend="100% Rate" 
+          isPositive={true} 
+          trendLabel="Tier 2 Schedule"
+          icon={DollarSign} 
+          colorClass="text-indigo-600" 
+          bgClass="bg-indigo-50"
+        />
+        <StatisticCard 
+          title="Quote Cross-Checks" 
+          value="24" 
+          trend="0 Discrepancy" 
+          isPositive={true} 
+          trendLabel="Reference quotes"
+          icon={Copy} 
+          colorClass="text-emerald-600" 
+          bgClass="bg-emerald-50"
+        />
+        <StatisticCard 
+          title="NLP Text Mapped" 
+          value="8" 
+          trend="Saved as rules" 
+          isPositive={true} 
+          trendLabel="Freeform text"
+          icon={Layers} 
+          colorClass="text-blue-600" 
+          bgClass="bg-blue-50"
+        />
+        <StatisticCard 
+          title="Active Blockers" 
+          value="0" 
+          trend="All clear" 
+          isPositive={true} 
+          trendLabel="Zero variance"
+          icon={ShieldCheck} 
+          colorClass="text-emerald-600" 
+          bgClass="bg-emerald-50"
+        />
       </div>
 
       {/* Exception Queue Table */}
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row gap-4 justify-between">
-          <div className="flex items-center gap-2">
-            <h2 className="text-base font-bold text-slate-800">Verification Ledger</h2>
-            <span className="px-2.5 py-0.5 bg-emerald-100 text-emerald-800 text-xs font-bold rounded-full">All Scenarios Resolved</span>
-          </div>
+      <Card className="shadow-2xs border-slate-200/80">
+        <div className="p-3.5 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+          <h2 className="text-xs font-bold uppercase tracking-wider text-slate-700">Verification Ledger Activity</h2>
+          <span className="px-2.5 py-0.5 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-semibold rounded">
+            All Scenarios Resolved
+          </span>
         </div>
 
         <CardContent className="p-0 overflow-hidden flex flex-col">

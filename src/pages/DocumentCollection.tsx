@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Mail, FolderSync, Clock, RefreshCw, FileText, AlertCircle, HardDrive, DownloadCloud, Activity, ShieldCheck, Server } from 'lucide-react';
+import { Mail, FolderSync, Clock, RefreshCw, FileText, AlertCircle, HardDrive, Activity, ShieldCheck, Server } from 'lucide-react';
 import { Card, CardHeader, CardTitle, CardContent } from '../components/ui/Card';
 import { DataTable, type Column } from '../components/ui/DataTable';
 
@@ -70,23 +70,27 @@ export const DocumentCollection = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
+      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <DownloadCloud className="w-8 h-8 text-indigo-600" /> Automated Document Ingestion
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
+            Document Ingestion & Mailbox Listeners
           </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Monitors inbound corporate mailboxes and shared network scanner hotfolders for customer purchase orders.
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Automated polling daemons monitoring Infratech email inboxes, network scan folders, and SFTP endpoints.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex items-center gap-2.5">
           <button 
             onClick={triggerScan}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5"
+            disabled={isScanning}
+            className={`flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all ${
+              isScanning ? 'opacity-70 cursor-not-allowed' : ''
+            }`}
           >
-            <RefreshCw className={`w-4 h-4 ${isScanning ? 'animate-spin' : ''}`} /> 
-            {isScanning ? 'Syncing Inboxes...' : 'Poll Mailboxes Now'}
+            <RefreshCw className={`w-3.5 h-3.5 ${isScanning ? 'animate-spin' : ''}`} />
+            <span>{isScanning ? 'Polling Sources...' : 'Poll Sources Now'}</span>
           </button>
         </div>
       </div>

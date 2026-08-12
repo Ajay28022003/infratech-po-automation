@@ -81,42 +81,41 @@ export const UserManagement = () => {
   ];
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            <Shield className="w-8 h-8 text-indigo-600" /> User Management & RBAC
-          </h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">
-            Manage Infratech commercial team members, role-based approval privileges, and ERP access keys.
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">User Management & Access Controls</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">
+            Commercial team members, role-based approval privileges, and ERP posting permissions.
           </p>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2.5">
           <button 
             onClick={() => setIsInviteModalOpen(true)}
-            className="flex items-center gap-2 px-4 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5">
-            <UserPlus className="w-4 h-4" /> Invite Team Member
+            className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all"
+          >
+            <UserPlus className="w-3.5 h-3.5" /> Invite Team Member
           </button>
         </div>
       </div>
 
       {/* KPI Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <StatisticCard title="Total Team Members" value="6 Active" icon={UserPlus} />
-        <StatisticCard title="Commercial Approvers" value="2 Managers" icon={CheckCircle2} colorClass="text-emerald-600" bgClass="bg-emerald-50" borderClass="border-emerald-100" />
-        <StatisticCard title="Sage 300 Sync Service" value="Connected" icon={Shield} colorClass="text-indigo-600" bgClass="bg-indigo-50" borderClass="border-indigo-100" />
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <StatisticCard title="Total Team Members" value="6 Active" icon={UserPlus} isPositive={true} trendLabel="Authorized" trend="6 Users" />
+        <StatisticCard title="Commercial Approvers" value="2 Managers" icon={CheckCircle2} colorClass="text-emerald-600" bgClass="bg-emerald-50" isPositive={true} trendLabel="Single-level" trend="Level 1" />
+        <StatisticCard title="Sage 300 Sync Service" value="Connected" icon={Shield} colorClass="text-indigo-600" bgClass="bg-indigo-50" isPositive={true} trendLabel="Company 11975" trend="Live" />
       </div>
 
       {/* Main Table Card */}
-      <Card className="flex-1 flex flex-col overflow-hidden shadow-md">
-        <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row gap-4 justify-between">
+      <Card className="shadow-2xs border-slate-200/80">
+        <div className="p-3.5 border-b border-slate-100 bg-slate-50/50 flex flex-col xl:flex-row gap-4 justify-between">
           <div className="relative max-w-md w-full">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-400" />
             <input 
               type="text"
-              placeholder="Search team members by name or @infratech.ae email..."
-              className="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-indigo-500 outline-none transition-all shadow-xs"
+              placeholder="Search team members by name or email..."
+              className="w-full pl-9 pr-4 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-medium focus:border-indigo-500 outline-none transition-all"
             />
           </div>
         </div>

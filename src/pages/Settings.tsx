@@ -156,28 +156,29 @@ export const Settings = () => {
   };
 
   return (
-    <div className="space-y-6 h-full flex flex-col animate-in fade-in duration-500 pb-12">
+    <div className="space-y-6 animate-in fade-in duration-300 pb-8">
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">System Settings & Configuration</h1>
-          <p className="text-sm text-slate-500 mt-1 font-medium">Global parameters, Sage 300 ERP endpoints, and AI recognition rules for Infratech FZ LLC.</p>
+          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">System Settings & Configuration</h1>
+          <p className="text-xs text-slate-500 mt-1 font-normal">Global parameters, Sage 300 ERP endpoints, and AI recognition rules for Infratech FZ LLC.</p>
         </div>
-        <div className="flex gap-3">
-          <button className="flex items-center gap-2 px-5 py-2.5 bg-indigo-600 text-white text-sm font-semibold rounded-xl hover:bg-indigo-700 shadow-md shadow-indigo-200 transition-all hover:-translate-y-0.5">
-            <Save className="w-4 h-4" /> Save Preferences
+        <div className="flex gap-2.5">
+          <button className="flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white text-xs font-semibold rounded-lg hover:bg-indigo-700 shadow-2xs transition-all">
+            <Save className="w-3.5 h-3.5" /> Save Preferences
           </button>
         </div>
       </div>
 
-      <Card className="flex-1 flex overflow-hidden bg-white shadow-md">
-        {/* Left Menu */}
-        <div className="w-64 border-r border-slate-100 bg-slate-50/50 p-3 hidden md:block">
-          <div className="space-y-1">
-            {settingTabs.map(tab => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
+      <Card className="shadow-2xs border-slate-200/80 overflow-hidden">
+        <div className="flex flex-col md:flex-row min-h-[450px]">
+          {/* Left Menu */}
+          <div className="w-full md:w-60 border-b md:border-b-0 md:border-r border-slate-100 bg-slate-50/50 p-3 shrink-0">
+            <div className="space-y-0.5">
+              {settingTabs.map(tab => {
+                const Icon = tab.icon;
+                const isActive = activeTab === tab.id;
+                return (
+                  <button
                   key={tab.id}
                   onClick={() => setActiveTab(tab.id)}
                   className={`w-full flex items-center gap-3 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
@@ -198,6 +199,7 @@ export const Settings = () => {
         <CardContent className="flex-1 p-6 overflow-y-auto custom-scrollbar">
           {renderContent()}
         </CardContent>
+        </div>
       </Card>
     </div>
   );
