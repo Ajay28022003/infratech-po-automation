@@ -21,7 +21,7 @@ const mockData: PurchaseOrder[] = [
   { id: '4517145590', customer: 'M/s. EATON FZE', poDate: 'May 12, 2026', deliveryDate: 'Jun 30, 2026', amount: 'AED 64,682.00', status: 'Approved', erpStatus: 'Synced (Sage 300)', source: 'Email (invoices@infratech.ae)', scenarioRef: 'Scenario 1: Price List Match' },
   { id: 'PO-VD-44192', customer: 'M/s. Verger Delporte UAE Ltd', poDate: 'Jul 10, 2026', deliveryDate: 'Aug 10, 2026', amount: 'AED 28,831.00', status: 'Approved', erpStatus: 'Synced (Sage 300)', source: 'Email (orders@infratech.ae)', scenarioRef: 'Scenario 2: Quote Match (ENQ-26-E-0164)' },
   { id: 'PO-CSO-9912', customer: 'M/s. CAN SERV OIL & GAS', poDate: 'May 04, 2026', deliveryDate: 'May 25, 2026', amount: 'AED 107,152.00', status: 'Approved', erpStatus: 'Synced (Sage 300)', source: 'Email (bhavani@infratech.ae)', scenarioRef: 'Scenario 3: Quote (No SKU)' },
-  { id: 'PO-EN-7296', customer: 'M/s. ENCOM TRADING LLC', poDate: 'May 02, 2026', deliveryDate: 'May 20, 2026', amount: 'AED 18,600.00', status: 'Approved', erpStatus: 'Synced (Sage 300)', source: 'Email (orders@infratech.ae)', scenarioRef: 'Scenario 4: Part Cross-Match' },
+  { id: 'PO-EN-7296', customer: 'M/s. ENCOM TRADING LLC', poDate: 'May 02, 2026', deliveryDate: 'May 20, 2026', amount: 'AED 520.80', status: 'Approved', erpStatus: 'Synced (Sage 300)', source: 'Email (orders@infratech.ae)', scenarioRef: 'Scenario 4: Part Cross-Match' },
   { id: 'PO-AS-10492', customer: 'M/s. Al Shariq Switchgear', poDate: 'Jul 15, 2026', deliveryDate: 'Aug 05, 2026', amount: 'AED 34,200.00', status: 'Pending Review', erpStatus: 'Pending', source: 'Scan Hotfolder', scenarioRef: 'Manual Scan Ingestion' },
 ];
 

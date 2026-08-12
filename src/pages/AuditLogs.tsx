@@ -16,10 +16,10 @@ interface AuditLogEntry {
 }
 
 const mockAuditData: AuditLogEntry[] = [
-  { id: '1', timestamp: '2026-05-12 10:46:12', user: 'Bhavani Prasad', role: 'Commercial Manager', module: 'Approval & Sage 300', action: 'Post Sales Order', status: 'Success', correlationId: 'req_eaton_99', duration: '0.8s', details: 'Approved & Created SO-S00006715 for EATON FZE (PO 4517145590, Value: AED 67,916.10)' },
+  { id: '1', timestamp: '2026-05-12 10:46:12', user: 'Bhavani Prasad', role: 'Commercial Manager', module: 'Approval & Sage 300', action: 'Post Sales Order', status: 'Success', correlationId: 'req_eaton_99', duration: '0.8s', details: 'Approved & Created SO-S00006715 for EATON FZE (PO 4517145590, Value: AED 64,682.00)' },
   { id: '2', timestamp: '2026-07-10 09:16:45', user: 'Bhavani Prasad', role: 'Commercial Manager', module: 'Approval & Sage 300', action: 'Post Sales Order', status: 'Success', correlationId: 'req_vd_0164', duration: '0.9s', details: 'Approved & Created SO-S00007526 for Verger Delporte UAE (PO-VD-44192, 10% Surcharge Applied)' },
   { id: '3', timestamp: '2026-05-04 03:56:30', user: 'Sarah Jenkins', role: 'Order Specialist', module: 'NLP Matching', action: 'Map Freeform Text', status: 'Success', correlationId: 'req_cso_9912', duration: '0.5s', details: 'NLP mapped 2000H x 1423W x 331D panel description to internal SKU INF-DB-2000-1423-A' },
-  { id: '4', timestamp: '2026-05-02 11:31:18', user: 'Sarah Jenkins', role: 'Order Specialist', module: 'Cross-Referencing', action: 'Map Customer Part', status: 'Success', correlationId: 'req_encom_7296', duration: '0.4s', details: 'Mapped customer part code ER-ENC-200 to Infratech SKU INF-ENC-2R16M' },
+  { id: '4', timestamp: '2026-05-02 11:31:18', user: 'Sarah Jenkins', role: 'Order Specialist', module: 'Cross-Referencing', action: 'Map Customer Part', status: 'Success', correlationId: 'req_encom_7296', duration: '0.4s', details: 'Mapped customer part code EG30119 to Infratech SKU INF-ENC-2R16M' },
   { id: '5', timestamp: '2026-07-15 08:30:00', user: 'System Service', role: 'Daemon', module: 'Document Ingestion', action: 'Poll Mailbox', status: 'Success', correlationId: 'job_sync_orders', duration: '1.2s', details: 'Fetched 3 new PDF attachments from orders@infratech.ae' },
 ];
 

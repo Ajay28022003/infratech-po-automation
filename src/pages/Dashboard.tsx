@@ -40,7 +40,7 @@ const recentPOs: PurchaseOrder[] = [
   { id: '4517145590', customer: 'M/s. EATON FZE', status: 'Processed', time: '10 mins ago', salesOrder: 'SO-S00006715', scenarioRef: 'Scenario 1: Price List Match', totalAmount: 'AED 64,682.00' },
   { id: 'PO-VD-44192', customer: 'M/s. Verger Delporte UAE Ltd', status: 'Processed', time: '45 mins ago', salesOrder: 'SO-S00007526', scenarioRef: 'Scenario 2: Quote ENQ-26-E-0164', totalAmount: 'AED 28,831.00' },
   { id: 'PO-CSO-9912', customer: 'M/s. CAN SERV OIL & GAS', status: 'Processed', time: '1 hr ago', salesOrder: 'SO-S00007469', scenarioRef: 'Scenario 3: NLP Description Match', totalAmount: 'AED 107,152.00' },
-  { id: 'PO-EN-7296', customer: 'M/s. ENCOM TRADING LLC', status: 'Processed', time: '2 hrs ago', salesOrder: 'SO-S00007296', scenarioRef: 'Scenario 4: Customer Part Map', totalAmount: 'AED 18,600.00' },
+  { id: 'PO-EN-7296', customer: 'M/s. ENCOM TRADING LLC', status: 'Processed', time: '2 hrs ago', salesOrder: 'SO-S00007296', scenarioRef: 'Scenario 4: Customer Part Map', totalAmount: 'AED 520.80' },
   { id: 'PO-AS-10492', customer: 'M/s. Al Shariq Switchgear', status: 'Pending', time: '3 hrs ago', salesOrder: 'Pending Review', scenarioRef: 'Manual Scan Hotfolder', totalAmount: 'AED 42,500.00' },
 ];
 
@@ -188,7 +188,7 @@ export const Dashboard = () => {
               title: 'Scenario 4: Part Cross-Match', 
               buyer: 'M/s. ENCOM TRADING LLC', 
               po: 'PO-EN-7296', 
-              desc: 'Customer code ER-ENC-200 mapped to SKU INF-ENC-2R16M (AED 18,600.00)',
+              desc: 'Customer code EG30119 mapped to SKU INF-ENC-2R16M (AED 520.80)',
               path: '/document-processing/PO-EN-7296',
               icon: ArrowRightLeft,
               iconBg: 'bg-purple-50 text-purple-600',

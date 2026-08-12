@@ -33,7 +33,7 @@ export const Reports = () => {
   const priceDiffData = [
     { id: '1', po: 'PO-VD-44192', item: 'IFC86/200+MP', poPrice: 'AED 315.00', quotePrice: 'AED 315.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
     { id: '2', po: '4517145590', item: 'XPSN22510B', poPrice: 'AED 1,064.00', quotePrice: 'AED 1,064.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
-    { id: '3', po: 'PO-EN-7296', item: 'INF-ENC-2R16M', poPrice: 'AED 460.00', quotePrice: 'AED 460.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
+    { id: '3', po: 'PO-EN-7296', item: 'INF-ENC-2R16M', poPrice: 'AED 124.00', quotePrice: 'AED 124.00', variance: 'AED 0.00 (Exact)', status: 'Verified' },
   ];
 
   // 4. Exceptions & Errors

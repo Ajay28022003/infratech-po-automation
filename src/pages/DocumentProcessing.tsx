@@ -72,7 +72,7 @@ const inboundPOs: InboundPO[] = [
     category: 'Email Quote',
     receivedDate: 'May 02, 2026 11:30 AM', 
     source: 'orders@infratech.ae', 
-    amount: 'AED 18,600.00',
+    amount: 'AED 520.80',
     status: 'Ready for Review', 
     confidence: '97.2%' 
   },

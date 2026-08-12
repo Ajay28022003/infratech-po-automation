@@ -64,14 +64,14 @@ const scenarios: Record<string, ScenarioData> = {
     shortTitle: 'Sc 1: EATON FZE (Price List)',
     badge: 'Price List Match',
     scenarioDescription: 'Customer order matched directly against approved Tier 2 Contract Price List schedule.',
-    crossCheckSummary: 'All 3 line items matched 100% against Eaton Tier 2 Contract Master Price List (0.00% Variance). Payment terms (90 Days Credit) and TRN verified.',
-    customer: 'EATON FZE',
+    crossCheckSummary: 'All 3 line items matched 100% against Eaton Tier 2 Contract Master Price List (0.00% Variance). Payment terms (Net 90 Days) and TRN verified. Designated Freezone supply (VAT Exempt 0%).',
+    customer: 'M/s. EATON FZE',
     customerAddress: 'Plot No: S30805, Jebel Ali Free Zone, Dubai, UAE',
     customerTRN: '100296552100003',
     poNumber: '4517145590',
     poDate: '12 May 2026',
-    deliveryTerms: 'DP World Unit 11, JAFZA Logistics Park, Dubai',
-    paymentTerms: '90 Days Credit',
+    deliveryTerms: 'DP World Unit 11, JAFZA Logistics Park (EXW Al Hamra Free Zone)',
+    paymentTerms: 'Net 90 Days',
     rawPoUrl: '/samples/scenario1_po.pdf',
     rawPoFilename: 'PO 4517145590 - Infratech.pdf',
     referenceDocument: {
@@ -86,7 +86,7 @@ const scenarios: Record<string, ScenarioData> = {
       { id: '2', itemCode: 'XPSN22510B', description: 'xPowerS PB 250A Bot 10W TPN-NZM1/PDE1 OG', qty: 28, extractedPrice: 1064.00, referencePrice: 1064.00, total: 29792.00, matchStatus: 'matched', matchDetail: 'Contract rate row 18' },
       { id: '3', itemCode: 'XPSN22512B', description: 'xPowerS PB 250A Bot 12W TPN-NZM1/PDE1 OG', qty: 18, extractedPrice: 1225.00, referencePrice: 1225.00, total: 22050.00, matchStatus: 'matched', matchDetail: 'Contract rate row 22' },
     ],
-    vatRate: 0.05,
+    vatRate: 0.00, // Designated Freezone / Tax Excluded
     targetSalesOrder: 'SO-S00006715',
     targetInvoice: 'IN00007477'
   },
@@ -97,14 +97,14 @@ const scenarios: Record<string, ScenarioData> = {
     shortTitle: 'Sc 1: EATON FZE (Price List)',
     badge: 'Price List Match',
     scenarioDescription: 'Customer order matched directly against approved Tier 2 Contract Price List schedule.',
-    crossCheckSummary: 'All 3 line items matched 100% against Eaton Tier 2 Contract Master Price List (0.00% Variance). Payment terms (90 Days Credit) and TRN verified.',
-    customer: 'EATON FZE',
+    crossCheckSummary: 'All 3 line items matched 100% against Eaton Tier 2 Contract Master Price List (0.00% Variance). Payment terms (Net 90 Days) and TRN verified. Designated Freezone supply (VAT Exempt 0%).',
+    customer: 'M/s. EATON FZE',
     customerAddress: 'Plot No: S30805, Jebel Ali Free Zone, Dubai, UAE',
     customerTRN: '100296552100003',
     poNumber: '4517145590',
     poDate: '12 May 2026',
-    deliveryTerms: 'DP World Unit 11, JAFZA Logistics Park, Dubai',
-    paymentTerms: '90 Days Credit',
+    deliveryTerms: 'DP World Unit 11, JAFZA Logistics Park (EXW Al Hamra Free Zone)',
+    paymentTerms: 'Net 90 Days',
     rawPoUrl: '/samples/scenario1_po.pdf',
     rawPoFilename: 'PO 4517145590 - Infratech.pdf',
     referenceDocument: {
@@ -119,7 +119,7 @@ const scenarios: Record<string, ScenarioData> = {
       { id: '2', itemCode: 'XPSN22510B', description: 'xPowerS PB 250A Bot 10W TPN-NZM1/PDE1 OG', qty: 28, extractedPrice: 1064.00, referencePrice: 1064.00, total: 29792.00, matchStatus: 'matched', matchDetail: 'Contract rate row 18' },
       { id: '3', itemCode: 'XPSN22512B', description: 'xPowerS PB 250A Bot 12W TPN-NZM1/PDE1 OG', qty: 18, extractedPrice: 1225.00, referencePrice: 1225.00, total: 22050.00, matchStatus: 'matched', matchDetail: 'Contract rate row 22' },
     ],
-    vatRate: 0.05,
+    vatRate: 0.00,
     targetSalesOrder: 'SO-S00006715',
     targetInvoice: 'IN00007477'
   },
@@ -131,7 +131,7 @@ const scenarios: Record<string, ScenarioData> = {
     badge: 'Quotation Match',
     scenarioDescription: 'Customer order matched against approved Quotation ENQ-26-E-0164 with exact panel part codes.',
     crossCheckSummary: 'All 8 enclosure part numbers matched approved quote ENQ-26-E-0164. 10% ex-works factory surcharge (AED 2,621.00) calculated per agreed terms.',
-    customer: 'Verger Delporte UAE Ltd',
+    customer: 'M/s. Verger Delporte UAE Ltd',
     customerAddress: 'P.O Box 5629, Industrial Road 1, Industrial Area 5, Sharjah, UAE',
     customerTRN: '100412893100003',
     poNumber: 'PO-VD-44192',
@@ -151,14 +151,14 @@ const scenarios: Record<string, ScenarioData> = {
       matchedDate: 'Approved on 05 Jul 2026'
     },
     items: [
-      { id: '1', itemCode: 'IFC86/200+MP', description: '800H x 600W x 200D Single Door Compact Enclosure with MP + Gland Plate', qty: 10, extractedPrice: 315.00, referencePrice: 315.00, total: 3150.00, matchStatus: 'matched', matchDetail: 'Quote Line #1' },
-      { id: '2', itemCode: 'IFC86/250+MP', description: '800H x 600W x 250D Single Door Compact Enclosure with MP + Gland Plate', qty: 10, extractedPrice: 345.00, referencePrice: 345.00, total: 3450.00, matchStatus: 'matched', matchDetail: 'Quote Line #2' },
-      { id: '3', itemCode: 'IFC108/300+MP+SD', description: '1000H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 10, extractedPrice: 520.00, referencePrice: 520.00, total: 5200.00, matchStatus: 'matched', matchDetail: 'Quote Line #3' },
-      { id: '4', itemCode: 'IFC128/300+MP+SD', description: '1200H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 10, extractedPrice: 600.00, referencePrice: 600.00, total: 6000.00, matchStatus: 'matched', matchDetail: 'Quote Line #4' },
-      { id: '5', itemCode: 'IFC66/150+MP', description: '600H x 600W x 150D Single Door Compact Enclosure with MP + Gland Plate', qty: 4, extractedPrice: 225.00, referencePrice: 225.00, total: 900.00, matchStatus: 'matched', matchDetail: 'Quote Line #5' },
-      { id: '6', itemCode: 'IFC148/300+MP+SD', description: '1400H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 4, extractedPrice: 685.00, referencePrice: 685.00, total: 2740.00, matchStatus: 'matched', matchDetail: 'Quote Line #6' },
-      { id: '7', itemCode: 'IFL168/300+MP+SD', description: '1600H x 800W x 300D Single Door Large Enclosure with MP + Gland Plate', qty: 4, extractedPrice: 980.00, referencePrice: 980.00, total: 3920.00, matchStatus: 'matched', matchDetail: 'Quote Line #7' },
-      { id: '8', itemCode: 'IFL188/400+MP+SD', description: '1800H x 800W x 400D Single Door Large Enclosure with MP + Gland Plate', qty: 1, extractedPrice: 850.00, referencePrice: 850.00, total: 850.00, matchStatus: 'matched', matchDetail: 'Quote Line #8' },
+      { id: '1', itemCode: 'IFC86/200+MP', description: '800H x 600W x 200D Single Door Compact Enclosure with MP + Gland Plate', qty: 27, extractedPrice: 315.00, referencePrice: 315.00, total: 8505.00, matchStatus: 'matched', matchDetail: 'Quote Line #1' },
+      { id: '2', itemCode: 'IFC128/300+MP+SD', description: '1200H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 17, extractedPrice: 600.00, referencePrice: 600.00, total: 10200.00, matchStatus: 'matched', matchDetail: 'Quote Line #2' },
+      { id: '3', itemCode: 'IFC66/150+MP', description: '600H x 600W x 150D Single Door Compact Enclosure with MP + Gland Plate', qty: 2, extractedPrice: 225.00, referencePrice: 225.00, total: 450.00, matchStatus: 'matched', matchDetail: 'Quote Line #3' },
+      { id: '4', itemCode: 'IFC148/300+MP+SD', description: '1400H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 7, extractedPrice: 685.00, referencePrice: 685.00, total: 4795.00, matchStatus: 'matched', matchDetail: 'Quote Line #4' },
+      { id: '5', itemCode: 'IFC126/200+MP', description: '1200H x 600W x 200D Single Door Compact Enclosure with MP + Gland Plate', qty: 1, extractedPrice: 460.00, referencePrice: 460.00, total: 460.00, matchStatus: 'matched', matchDetail: 'Quote Line #5' },
+      { id: '6', itemCode: 'IFC106/200+MP', description: '1000H x 600W x 200D Single Door Compact Enclosure with MP + Gland Plate', qty: 1, extractedPrice: 390.00, referencePrice: 390.00, total: 390.00, matchStatus: 'matched', matchDetail: 'Quote Line #6' },
+      { id: '7', itemCode: 'IFC88/300+MP', description: '800H x 800W x 300D Single Door Compact Enclosure with MP + Gland Plate', qty: 1, extractedPrice: 430.00, referencePrice: 430.00, total: 430.00, matchStatus: 'matched', matchDetail: 'Quote Line #7' },
+      { id: '8', itemCode: 'IFL168/300+MP+SD', description: '1600H x 800W x 300D Single Door Large Enclosure with MP + Gland Plate', qty: 1, extractedPrice: 980.00, referencePrice: 980.00, total: 980.00, matchStatus: 'matched', matchDetail: 'Quote Line #8' },
     ],
     hasSurcharge: true,
     surchargePercent: 10,
@@ -173,15 +173,15 @@ const scenarios: Record<string, ScenarioData> = {
     title: 'Scenario 3: Customer PO based on Quotation (Without Part References)',
     shortTitle: 'Sc 3: Can Serv Oil (NLP Match)',
     badge: 'NLP Text Match',
-    scenarioDescription: 'PO text description mapped to internal SKU INF-DB-2000-1423-A using AI NLP parameter extraction.',
-    crossCheckSummary: 'Freeform text description extracted parameters (2000H x 1423W x 331D IP55 Double Door) and successfully mapped to internal SKU INF-DB-2000-1423-A with 98.5% confidence.',
-    customer: 'Can Serv Oil & Gas',
-    customerAddress: 'Sector M-34, Musaffah Industrial Area, Abu Dhabi, UAE',
+    scenarioDescription: 'PO text description mapped to internal SKU INF-DB-2000-1423 using AI NLP parameter extraction.',
+    crossCheckSummary: 'Freeform text description extracted parameters (2000H x 1423W x 331D Distribution Panel) and mapped to internal SKU INF-DB-2000-1423 with 98.5% confidence. 5% UAE VAT applied.',
+    customer: 'M/s. CAN SERV OIL & GAS',
+    customerAddress: 'WIZ07-19 Shed n 07, Al Mabmra Industrial Zone, RAK, UAE',
     customerTRN: '100998124500003',
     poNumber: 'PO-CSO-9912',
-    poDate: '04 May 2026',
+    poDate: '29 June 2026',
     quoteRef: 'QT-EMAIL-PO00670',
-    deliveryTerms: 'Musaffah Depot, Abu Dhabi',
+    deliveryTerms: 'DDP, RAK Warehouse / Musaffah Depot',
     paymentTerms: '30 Days Credit',
     rawPoUrl: '/samples/scenario3_po.pdf',
     rawPoFilename: 'PO.pdf (Can Serv Oil)',
@@ -195,12 +195,11 @@ const scenarios: Record<string, ScenarioData> = {
       matchedDate: 'Email confirmed 28 Apr 2026'
     },
     items: [
-      { id: '1', itemCode: 'INF-DB-2000-1423-A', description: '2000H x 1423W x 331D Distribution Panel Enclosure IP55 with Mounting Plate & Double Door', qty: 4, extractedPrice: 24350.00, referencePrice: 24350.00, total: 97400.00, matchStatus: 'mapped_from_text', matchDetail: 'NLP mapped from freeform text (98.5%)' },
+      { id: '1', itemCode: 'INF-DB-2000-1423-A', description: '2000H x 1423W x 331D Distribution Panel Enclosure, Ral 9003 Matt (Drawing Pocket, Brackets & Din Rail)', qty: 6, extractedPrice: 7850.00, referencePrice: 7850.00, total: 47100.00, matchStatus: 'mapped_from_text', matchDetail: 'NLP mapped from freeform text Line #1 (98.5%)' },
+      { id: '2', itemCode: 'INF-DB-2000-1423-B', description: '2000H x 1423W x 331D Distribution Panel Enclosure, Ral 9003 Matt (Drawing Pocket, Brackets & Din Rail)', qty: 7, extractedPrice: 7850.00, referencePrice: 7850.00, total: 54950.00, matchStatus: 'mapped_from_text', matchDetail: 'NLP mapped from freeform text Line #2 (98.5%)' },
     ],
-    hasSurcharge: true,
-    surchargePercent: 10,
-    surchargeAmount: 9752.00,
-    vatRate: 0.00,
+    hasSurcharge: false,
+    vatRate: 0.05,
     targetSalesOrder: 'SO-S00007469',
     targetInvoice: 'IN00007469'
   },
@@ -210,34 +209,32 @@ const scenarios: Record<string, ScenarioData> = {
     title: 'Scenario 4: Quotation without Part Number & Customer PO with Customer Part Number',
     shortTitle: 'Sc 4: Encom (Part Cross-Ref)',
     badge: 'Customer Part Cross-Ref',
-    scenarioDescription: 'Customer order used customer part number ER-ENC-200. Cross-matched to internal SKU INF-ENC-2R16M.',
-    crossCheckSummary: 'Customer code ER-ENC-200 found in customer cross-reference dictionary. Translated directly to Infratech SKU INF-ENC-2R16M (Rate: AED 460.00).',
-    customer: 'Encom Trading LLC',
-    customerAddress: 'P.O Box 17421, Electro RAK Group, Ras Al Khaimah, UAE',
-    customerTRN: '100881923100003',
+    scenarioDescription: 'Customer order used customer part number EG30119. Cross-matched to internal SKU INF-ENC-2R16M.',
+    crossCheckSummary: 'Customer code EG30119 (2ROW 16MODULE DB ENCLOSURE) translated directly to Infratech SKU INF-ENC-2R16M (Rate: AED 124.00). 5% UAE VAT applied.',
+    customer: 'M/s. ENCOM TRADING LLC',
+    customerAddress: 'P.O Box 14521, Electro RAK Group, Ras Al Khaimah, UAE',
+    customerTRN: '100028651600003',
     poNumber: 'PO-EN-7296',
-    poDate: '02 May 2026',
+    poDate: '07 May 2026',
     quoteRef: 'QT-EMAIL-ENCOM',
-    deliveryTerms: 'Ras Al Khaimah Central Warehouse',
-    paymentTerms: '30 Days PDC',
+    deliveryTerms: 'DELIVERY AT ENCOM, Ras Al Khaimah',
+    paymentTerms: '90 DAYS PDC',
     rawPoUrl: '/samples/scenario4_po.pdf',
     rawPoFilename: 'PO.pdf (Encom Trading)',
     rawQuoteUrl: '/samples/scenario4_quote.png',
     rawQuoteFilename: 'Quotation Email Encom Group.png',
     referenceDocument: {
       type: 'Email Quote',
-      name: 'Email Quote - Encom Group',
-      description: 'Cross-referenced customer SKU ER-ENC-200 to Infratech item INF-ENC-2R16M',
+      name: 'Email Quote - Encom Group (eng-p100137-rak ind)',
+      description: 'Email quote for 2 Row 16 Module Enclosure Surface @ AED 124 per Qty',
       referenceCode: 'QT-EMAIL-ENCOM',
-      matchedDate: 'Email confirmed 25 Apr 2026'
+      matchedDate: 'Email confirmed 04 May 2026'
     },
     items: [
-      { id: '1', itemCode: 'INF-ENC-2R16M', customerItemCode: 'ER-ENC-200', description: '1200H x 600W x 200D Single Door Compact Enclosure IP65 with Gland Plate', qty: 35, extractedPrice: 460.00, referencePrice: 460.00, total: 16100.00, matchStatus: 'cross_referenced', matchDetail: 'Cust SKU ER-ENC-200 -> INF-ENC-2R16M' },
+      { id: '1', itemCode: 'INF-ENC-2R16M', customerItemCode: 'EG30119', description: '2ROW 16MODULE DB ENCLOSURE, SURFACE MOUNTING TYPE', qty: 4, extractedPrice: 124.00, referencePrice: 124.00, total: 496.00, matchStatus: 'cross_referenced', matchDetail: 'Cust SKU EG30119 -> INF-ENC-2R16M' },
     ],
-    hasSurcharge: true,
-    surchargePercent: 15.5,
-    surchargeAmount: 2500.00,
-    vatRate: 0.00,
+    hasSurcharge: false,
+    vatRate: 0.05,
     targetSalesOrder: 'SO-S00007296',
     targetInvoice: 'IN00007296'
   }
@@ -692,10 +689,17 @@ export const DocumentValidation = () => {
                   <span className="font-mono font-bold">+ AED {surchargeAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-600">
-                <span>UAE VAT ({activeScenario.vatRate * 100}%):</span>
-                <span className="font-mono font-bold text-slate-800">AED {vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-              </div>
+              {activeScenario.vatRate > 0 ? (
+                <div className="flex justify-between text-slate-600">
+                  <span>UAE VAT ({(activeScenario.vatRate * 100).toFixed(0)}%):</span>
+                  <span className="font-mono font-bold text-slate-800">AED {vatAmount.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+              ) : (
+                <div className="flex justify-between text-slate-500">
+                  <span>UAE VAT (Free Zone / Tax Excluded 0%):</span>
+                  <span className="font-mono font-medium text-slate-600">AED 0.00</span>
+                </div>
+              )}
               <div className="h-px bg-slate-200 my-1"></div>
               <div className="flex justify-between text-sm font-bold text-slate-900">
                 <span>Verified Sage 300 Order Total:</span>
